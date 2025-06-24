@@ -6,134 +6,331 @@
     <title>제주교육청 스마트단말 관리 시스템</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .tg-header {
-            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+        :root {
+            --primary-color: #4a5568;
+            --secondary-color: #718096;
+            --accent-color: #3182ce;
+            --success-color: #38a169;
+            --warning-color: #d69e2e;
+            --danger-color: #e53e3e;
+            --light-gray: #f7fafc;
+            --dark-gray: #2d3748;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: var(--light-gray);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark-gray) 0%, var(--primary-color) 100%);
             color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .tg-sidebar {
-            background: linear-gradient(180deg, #e2e8f0 0%, #f7fafc 100%);
-            border-right: 1px solid #cbd5e0;
+
+        .sidebar {
+            background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e0 100%);
+            border-right: 2px solid #a0aec0;
         }
-        .tg-content {
-            background: #ffffff;
-        }
-        .tg-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .tg-card.green {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        }
-        .tg-card.orange {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-        }
-        .tg-card.red {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-        }
-        .tg-btn-primary {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
-        .tg-btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(66, 153, 225, 0.4);
-        }
-        .tg-btn-success {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
-        .tg-btn-danger {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
-        .tg-modal {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-        }
-        .tg-modal-content {
+
+        .main-content {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            min-height: calc(100vh - 64px);
         }
-        .tg-table {
+
+        .card {
             background: white;
             border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
         }
-        .tg-table thead {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+
+        .btn-primary {
+            background: var(--accent-color);
             color: white;
-        }
-        .tg-input {
-            border: 2px solid #e2e8f0;
+            border: none;
+            padding: 8px 16px;
             border-radius: 6px;
-            padding: 8px 12px;
-            transition: border-color 0.3s;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .tg-input:focus {
-            border-color: #4299e1;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+
+        .btn-primary:hover {
+            background: #2c5aa0;
+            transform: translateY(-1px);
         }
-        .draggable-modal {
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-success:hover {
+            background: #2f855a;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+            transform: translateY(-1px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 8px;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
             cursor: move;
         }
-        .menu-item {
-            transition: all 0.3s;
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark-gray);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #2c5aa0 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-card.success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #2f855a 100%);
+        }
+
+        .dashboard-card.warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #b7791f 100%);
+        }
+
+        .dashboard-card.danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #c53030 100%);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .pagination button:hover {
+            background: #f3f4f6;
+        }
+
+        .pagination button:disabled {
+            background: #f9fafb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .accessories-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
             border-radius: 6px;
         }
-        .menu-item:hover {
-            background: rgba(66, 153, 225, 0.1);
-            transform: translateX(4px);
+
+        .accessories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
         }
-        .menu-item.active {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-            color: white;
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-rental {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-available {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: 2% auto;
+                max-width: 95%;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body>
     <!-- Login Screen -->
-    <div id="loginScreen" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div class="text-center mb-8">
-                <div class="w-20 h-20 mx-auto mb-4 bg-blue-500 rounded-full flex items-center justify-center">
-                    <i class="fas fa-graduation-cap text-white text-2xl"></i>
-                </div>
-                <h1 class="text-2xl font-bold text-gray-800">제주교육청</h1>
-                <h2 class="text-lg text-gray-600">스마트단말 관리 시스템</h2>
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <i class="fas fa-laptop"></i>
             </div>
+            <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">제주교육청 스마트단말 관리 시스템</h1>
             <form id="loginForm">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">사용자명</label>
-                    <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="사용자명을 입력하세요">
+                <div class="form-group">
+                    <label>사용자명</label>
+                    <input type="text" id="username" class="form-control" placeholder="사용자명을 입력하세요">
                 </div>
-                <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">비밀번호</label>
-                    <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="비밀번호를 입력하세요">
+                <div class="form-group">
+                    <label>비밀번호</label>
+                    <input type="password" id="password" class="form-control" placeholder="비밀번호를 입력하세요">
                 </div>
-                <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">로그인</button>
+                <button type="submit" class="btn-primary w-full py-3 text-lg">로그인</button>
             </form>
-            <div class="mt-6 text-center text-sm text-gray-600">
+            <div class="text-center mt-6 text-sm text-gray-600">
                 <p>콜센터 번호: 1811-8290</p>
             </div>
         </div>
@@ -142,174 +339,156 @@
     <!-- Main System -->
     <div id="mainSystem" class="hidden">
         <!-- Header -->
-        <header class="tg-header h-16 flex items-center justify-between px-6">
-            <div class="flex items-center">
-                <i class="fas fa-laptop text-2xl mr-3"></i>
+        <div class="header px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <i class="fas fa-laptop text-2xl"></i>
                 <h1 class="text-xl font-bold">제주교육청 스마트단말 관리 시스템</h1>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center gap-4">
                 <span id="currentUser" class="text-sm"></span>
-                <span id="currentTime" class="text-sm"></span>
+                <button id="logoutBtn" class="btn-danger">로그아웃</button>
             </div>
-        </header>
+        </div>
 
-        <div class="flex h-screen pt-16">
+        <div class="flex">
             <!-- Sidebar -->
-            <nav class="tg-sidebar w-64 p-4">
-                <div class="space-y-2">
-                    <div class="menu-item p-3 cursor-pointer" onclick="showPage('rental')">
-                        <i class="fas fa-clipboard-list mr-3"></i>대여 관리
-                    </div>
-                    <div class="menu-item p-3 cursor-pointer" onclick="showPage('products')">
-                        <i class="fas fa-box mr-3"></i>제품 관리
-                    </div>
-                    <div class="menu-item p-3 cursor-pointer" onclick="showPage('users')" id="userManagementMenu">
-                        <i class="fas fa-users mr-3"></i>사용자 관리
-                    </div>
-                    <div class="menu-item p-3 cursor-pointer" onclick="showPage('feedback')">
-                        <i class="fas fa-comments mr-3"></i>피드백 게시판
-                    </div>
-                </div>
-                <div class="absolute bottom-4 left-4">
-                    <button onclick="logout()" class="text-sm text-gray-600 hover:text-red-500 transition-colors">
-                        <i class="fas fa-sign-out-alt mr-1"></i>로그아웃
-                    </button>
-                </div>
-            </nav>
+            <div class="sidebar w-64 min-h-screen p-4">
+                <nav class="space-y-2">
+                    <a href="#" class="menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-white hover:shadow-sm transition-all" data-page="rental">
+                        <i class="fas fa-clipboard-list text-blue-600"></i>
+                        <span class="font-medium">대여 관리</span>
+                    </a>
+                    <a href="#" class="menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-white hover:shadow-sm transition-all" data-page="products">
+                        <i class="fas fa-box text-green-600"></i>
+                        <span class="font-medium">제품 관리</span>
+                    </a>
+                    <a href="#" class="menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-white hover:shadow-sm transition-all admin-only" data-page="users">
+                        <i class="fas fa-users text-purple-600"></i>
+                        <span class="font-medium">사용자 관리</span>
+                    </a>
+                    <a href="#" class="menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-white hover:shadow-sm transition-all" data-page="feedback">
+                        <i class="fas fa-comments text-orange-600"></i>
+                        <span class="font-medium">피드백 게시판</span>
+                    </a>
+                </nav>
+            </div>
 
             <!-- Main Content -->
-            <main class="flex-1 tg-content p-6 overflow-y-auto">
-                <!-- Rental Management -->
+            <div class="main-content flex-1 p-6">
+                <!-- Rental Management Page -->
                 <div id="rentalPage" class="page">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">대여 관리</h2>
-                    <p class="text-gray-600 mb-6">스마트단말 대여 현황을 관리합니다.</p>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold mb-4">대여 관리</h2>
+                        <p class="text-gray-600">스마트단말 대여 현황을 관리합니다.</p>
+                    </div>
 
                     <!-- Dashboard Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <div class="tg-card text-white p-6">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm opacity-80">1차 장비 수</p>
-                                    <p class="text-3xl font-bold" id="firstEquipCount">0</p>
-                                </div>
-                                <i class="fas fa-laptop text-4xl opacity-80"></i>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="dashboard-card">
+                            <h3 class="text-sm font-medium opacity-90">1차 장비 수</h3>
+                            <p class="text-3xl font-bold" id="phase1Count">0</p>
+                            <i class="fas fa-laptop text-2xl opacity-50 float-right mt-2"></i>
                         </div>
-                        <div class="tg-card green text-white p-6">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm opacity-80">2차 장비 수</p>
-                                    <p class="text-3xl font-bold" id="secondEquipCount">0</p>
-                                </div>
-                                <i class="fas fa-tablet text-4xl opacity-80"></i>
-                            </div>
+                        <div class="dashboard-card success">
+                            <h3 class="text-sm font-medium opacity-90">2차 장비 수</h3>
+                            <p class="text-3xl font-bold" id="phase2Count">0</p>
+                            <i class="fas fa-tablet text-2xl opacity-50 float-right mt-2"></i>
                         </div>
-                        <div class="tg-card orange text-white p-6">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm opacity-80">대여중</p>
-                                    <p class="text-3xl font-bold" id="rentedCount">0</p>
-                                </div>
-                                <i class="fas fa-hand-holding text-4xl opacity-80"></i>
-                            </div>
+                        <div class="dashboard-card warning">
+                            <h3 class="text-sm font-medium opacity-90">대여중</h3>
+                            <p class="text-3xl font-bold" id="rentalCount">0</p>
+                            <i class="fas fa-hand-holding text-2xl opacity-50 float-right mt-2"></i>
                         </div>
-                        <div class="tg-card red text-white p-6">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm opacity-80">미 대여중</p>
-                                    <p class="text-3xl font-bold" id="availableCount">0</p>
-                                </div>
-                                <i class="fas fa-exclamation-triangle text-4xl opacity-80"></i>
-                            </div>
+                        <div class="dashboard-card danger">
+                            <h3 class="text-sm font-medium opacity-90">미 대여중</h3>
+                            <p class="text-3xl font-bold" id="availableCount">0</p>
+                            <i class="fas fa-exclamation-triangle text-2xl opacity-50 float-right mt-2"></i>
                         </div>
                     </div>
 
                     <!-- Search and Filters -->
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                    <div class="card p-4 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">통합 검색</label>
-                                <input type="text" id="searchRental" class="tg-input w-full" placeholder="관리번호, 학교명, 학생명, 제품명...">
+                                <label class="block text-sm font-medium mb-2">통합 검색</label>
+                                <input type="text" id="rentalSearch" class="form-control" placeholder="관리번호, 학교명, 학생명, 제품명...">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">상태 선택</label>
-                                <select id="statusFilter" class="tg-input w-full">
+                                <label class="block text-sm font-medium mb-2">상태 선택</label>
+                                <select id="statusFilter" class="form-control">
                                     <option value="">전체 상태</option>
                                     <option value="대여중">대여중</option>
                                     <option value="미 대여중">미 대여중</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">차수 선택</label>
-                                <select id="phaseFilter" class="tg-input w-full">
+                                <label class="block text-sm font-medium mb-2">차수 선택</label>
+                                <select id="phaseFilter" class="form-control">
                                     <option value="">전체 차수</option>
                                     <option value="1차">1차</option>
                                     <option value="2차">2차</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">모델 선택</label>
-                                <select id="modelFilter" class="tg-input w-full">
+                                <label class="block text-sm font-medium mb-2">모델 선택</label>
+                                <select id="modelFilter" class="form-control">
                                     <option value="">전체 모델</option>
                                 </select>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">개인정보동의일자 시작</label>
-                                <input type="date" id="dateStart" class="tg-input w-full">
+                                <label class="block text-sm font-medium mb-2">개인정보동의일자 시작</label>
+                                <input type="date" id="dateStart" class="form-control">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">개인정보동의일자 종료</label>
-                                <input type="date" id="dateEnd" class="tg-input w-full">
+                                <label class="block text-sm font-medium mb-2">개인정보동의일자 종료</label>
+                                <input type="date" id="dateEnd" class="form-control">
                             </div>
                         </div>
                         <div class="flex gap-2 mt-4">
-                            <button onclick="searchRentals()" class="tg-btn-primary">
+                            <button id="searchBtn" class="btn-primary">
                                 <i class="fas fa-search mr-2"></i>검색
                             </button>
-                            <button onclick="resetSearch()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                                <i class="fas fa-undo mr-2"></i>초기화
+                            <button id="resetBtn" class="btn-success">
+                                <i class="fas fa-refresh mr-2"></i>초기화
                             </button>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex gap-2 mb-4">
-                        <button onclick="showAddRentalModal()" class="tg-btn-success">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <button id="addRentalBtn" class="btn-success">
                             <i class="fas fa-plus mr-2"></i>새 대여 추가
                         </button>
-                        <button onclick="downloadRentalSample()" class="tg-btn-primary">
+                        <button id="downloadRentalSampleBtn" class="btn-primary">
                             <i class="fas fa-download mr-2"></i>Excel 샘플
                         </button>
-                        <button onclick="document.getElementById('rentalUpload').click()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                        <button id="uploadRentalBtn" class="btn-primary">
                             <i class="fas fa-upload mr-2"></i>Excel 업로드
                         </button>
-                        <button onclick="deleteAllRentals()" class="tg-btn-danger">
+                        <button id="deleteAllRentalBtn" class="btn-danger admin-only">
                             <i class="fas fa-trash mr-2"></i>전체 삭제
                         </button>
                     </div>
-                    <input type="file" id="rentalUpload" accept=".xlsx,.xls" style="display: none;" onchange="uploadRentalData(this)">
 
                     <!-- Rental Table -->
-                    <div class="tg-table">
-                        <table class="min-w-full">
+                    <div class="table-container">
+                        <table id="rentalTable">
                             <thead>
                                 <tr>
-                                    <th class="px-4 py-3 text-left">
-                                        <input type="checkbox" id="selectAllRentals" onchange="toggleAllRentals()">
-                                    </th>
-                                    <th class="px-4 py-3 text-left">순번</th>
-                                    <th class="px-4 py-3 text-left">관리번호</th>
-                                    <th class="px-4 py-3 text-left">제품시리얼</th>
-                                    <th class="px-4 py-3 text-left">학교명</th>
-                                    <th class="px-4 py-3 text-left">학교급</th>
-                                    <th class="px-4 py-3 text-left">학생명</th>
-                                    <th class="px-4 py-3 text-left">제품명</th>
-                                    <th class="px-4 py-3 text-left">상태</th>
-                                    <th class="px-4 py-3 text-left">메모1</th>
-                                    <th class="px-4 py-3 text-left">메모2</th>
-                                    <th class="px-4 py-3 text-left">기타</th>
+                                    <th><input type="checkbox" id="selectAllRental"></th>
+                                    <th>순번</th>
+                                    <th>관리번호</th>
+                                    <th>제품시리얼</th>
+                                    <th>학교명</th>
+                                    <th>학교급</th>
+                                    <th>학생명</th>
+                                    <th>제품명</th>
+                                    <th>상태</th>
+                                    <th>메모1</th>
+                                    <th>메모2</th>
+                                    <th>기타</th>
                                 </tr>
                             </thead>
                             <tbody id="rentalTableBody">
@@ -318,64 +497,59 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div class="flex justify-center items-center mt-6 space-x-2">
-                        <button onclick="prevPage('rental')" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <input type="number" id="rentalCurrentPage" value="1" min="1" class="w-16 text-center border rounded" onchange="goToPage('rental', this.value)">
-                        <span>/ <span id="rentalTotalPages">1</span></span>
-                        <button onclick="nextPage('rental')" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+                    <div class="pagination" id="rentalPagination">
+                        <button id="prevPageRental">이전</button>
+                        <input type="number" id="currentPageRental" min="1" value="1" style="width: 60px; text-align: center;">
+                        <span>/ <span id="totalPagesRental">1</span></span>
+                        <button id="nextPageRental">다음</button>
                     </div>
                 </div>
 
-                <!-- Products Management -->
+                <!-- Products Management Page -->
                 <div id="productsPage" class="page hidden">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">제품 관리</h2>
-                    <p class="text-gray-600 mb-6">제품 데이터를 관리합니다.</p>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold mb-4">제품 관리</h2>
+                        <p class="text-gray-600">제품 데이터를 관리합니다.</p>
+                    </div>
 
                     <!-- Search -->
-                    <div class="mb-4">
-                        <input type="text" id="searchProducts" class="tg-input w-full max-w-md" placeholder="차수, 관리번호, 제품명, 시리얼 검색...">
-                        <button onclick="searchProducts()" class="tg-btn-primary ml-2">
+                    <div class="flex gap-4 mb-4">
+                        <input type="text" id="productSearch" class="form-control flex-1" placeholder="차수, 관리번호, 제품명, 시리얼 검색...">
+                        <button id="searchProductBtn" class="btn-primary">
                             <i class="fas fa-search mr-2"></i>검색
                         </button>
-                        <button onclick="resetProductSearch()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2">
-                            <i class="fas fa-undo mr-2"></i>초기화
+                        <button id="resetProductBtn" class="btn-success">
+                            <i class="fas fa-refresh mr-2"></i>초기화
                         </button>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex gap-2 mb-4">
-                        <button onclick="showAddProductModal()" class="tg-btn-success">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <button id="addProductBtn" class="btn-success admin-only">
                             <i class="fas fa-plus mr-2"></i>제품 추가
                         </button>
-                        <button onclick="downloadProductSample()" class="tg-btn-primary">
+                        <button id="downloadProductSampleBtn" class="btn-primary admin-only">
                             <i class="fas fa-download mr-2"></i>Excel 샘플
                         </button>
-                        <button onclick="document.getElementById('productUpload').click()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                        <button id="uploadProductBtn" class="btn-primary admin-only">
                             <i class="fas fa-upload mr-2"></i>Excel 업로드
                         </button>
-                        <button onclick="deleteAllProducts()" class="tg-btn-danger">
+                        <button id="deleteAllProductBtn" class="btn-danger admin-only">
                             <i class="fas fa-trash mr-2"></i>전체 삭제
                         </button>
                     </div>
-                    <input type="file" id="productUpload" accept=".xlsx,.xls" style="display: none;" onchange="uploadProductData(this)">
 
                     <!-- Products Table -->
-                    <div class="tg-table">
-                        <table class="min-w-full">
+                    <div class="table-container">
+                        <table id="productTable">
                             <thead>
                                 <tr>
-                                    <th class="px-4 py-3 text-left">
-                                        <input type="checkbox" id="selectAllProducts" onchange="toggleAllProducts()">
-                                    </th>
-                                    <th class="px-4 py-3 text-left">차수</th>
-                                    <th class="px-4 py-3 text-left">관리번호</th>
-                                    <th class="px-4 py-3 text-left">제품명</th>
-                                    <th class="px-4 py-3 text-left">시리얼</th>
-                                    <th class="px-4 py-3 text-left">작업</th>
+                                    <th><input type="checkbox" id="selectAllProduct"></th>
+                                    <th>차수</th>
+                                    <th>관리번호</th>
+                                    <th>제품명</th>
+                                    <th>시리얼</th>
+                                    <th>작업</th>
                                 </tr>
                             </thead>
                             <tbody id="productTableBody">
@@ -384,37 +558,37 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div class="flex justify-center items-center mt-6 space-x-2">
-                        <button onclick="prevPage('product')" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <input type="number" id="productCurrentPage" value="1" min="1" class="w-16 text-center border rounded" onchange="goToPage('product', this.value)">
-                        <span>/ <span id="productTotalPages">1</span></span>
-                        <button onclick="nextPage('product')" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+                    <div class="pagination" id="productPagination">
+                        <button id="prevPageProduct">이전</button>
+                        <input type="number" id="currentPageProduct" min="1" value="1" style="width: 60px; text-align: center;">
+                        <span>/ <span id="totalPagesProduct">1</span></span>
+                        <button id="nextPageProduct">다음</button>
                     </div>
                 </div>
 
-                <!-- User Management -->
+                <!-- Users Management Page -->
                 <div id="usersPage" class="page hidden">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">사용자 관리</h2>
-                    <p class="text-gray-600 mb-6">시스템 사용자를 관리합니다.</p>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold mb-4">사용자 관리</h2>
+                        <p class="text-gray-600">시스템 사용자를 관리합니다.</p>
+                    </div>
 
-                    <div class="mb-4">
-                        <button onclick="showAddUserModal()" class="tg-btn-success">
-                            <i class="fas fa-user-plus mr-2"></i>사용자 추가
+                    <!-- Action Buttons -->
+                    <div class="flex gap-2 mb-4">
+                        <button id="addUserBtn" class="btn-success">
+                            <i class="fas fa-plus mr-2"></i>사용자 추가
                         </button>
                     </div>
 
-                    <div class="tg-table">
-                        <table class="min-w-full">
+                    <!-- Users Table -->
+                    <div class="table-container">
+                        <table id="userTable">
                             <thead>
                                 <tr>
-                                    <th class="px-4 py-3 text-left">사용자명</th>
-                                    <th class="px-4 py-3 text-left">권한</th>
-                                    <th class="px-4 py-3 text-left">생성일</th>
-                                    <th class="px-4 py-3 text-left">작업</th>
+                                    <th>사용자명</th>
+                                    <th>권한</th>
+                                    <th>생성일</th>
+                                    <th>작업</th>
                                 </tr>
                             </thead>
                             <tbody id="userTableBody">
@@ -423,981 +597,1191 @@
                     </div>
                 </div>
 
-                <!-- Feedback Board -->
+                <!-- Feedback Board Page -->
                 <div id="feedbackPage" class="page hidden">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">피드백 게시판</h2>
-                    <p class="text-gray-600 mb-6">시스템 개선을 위한 의견을 나눠주세요.</p>
-
-                    <div class="mb-4">
-                        <button onclick="showAddPostModal()" class="tg-btn-success">
-                            <i class="fas fa-pen mr-2"></i>새 글 작성
-                        </button>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold mb-4">피드백 게시판</h2>
+                        <p class="text-gray-600">시스템 개선을 위한 의견을 공유합니다.</p>
                     </div>
 
-                    <div class="mb-4">
-                        <input type="text" id="searchPosts" class="tg-input w-full max-w-md" placeholder="제목 또는 내용 검색...">
-                        <button onclick="searchPosts()" class="tg-btn-primary ml-2">
+                    <!-- Search -->
+                    <div class="flex gap-4 mb-4">
+                        <input type="text" id="feedbackSearch" class="form-control flex-1" placeholder="제목, 내용으로 검색...">
+                        <button id="searchFeedbackBtn" class="btn-primary">
                             <i class="fas fa-search mr-2"></i>검색
                         </button>
                     </div>
 
-                    <div class="tg-table">
-                        <table class="min-w-full">
+                    <!-- Action Buttons -->
+                    <div class="flex gap-2 mb-4">
+                        <button id="addFeedbackBtn" class="btn-success">
+                            <i class="fas fa-plus mr-2"></i>새 글 작성
+                        </button>
+                    </div>
+
+                    <!-- Feedback Table -->
+                    <div class="table-container">
+                        <table id="feedbackTable">
                             <thead>
                                 <tr>
-                                    <th class="px-4 py-3 text-left">번호</th>
-                                    <th class="px-4 py-3 text-left">제목</th>
-                                    <th class="px-4 py-3 text-left">작성자</th>
-                                    <th class="px-4 py-3 text-left">작성일</th>
-                                    <th class="px-4 py-3 text-left">조회수</th>
+                                    <th>번호</th>
+                                    <th>제목</th>
+                                    <th>작성자</th>
+                                    <th>작성일</th>
+                                    <th>조회수</th>
+                                    <th>작업</th>
                                 </tr>
                             </thead>
                             <tbody id="feedbackTableBody">
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination" id="feedbackPagination">
+                        <button id="prevPageFeedback">이전</button>
+                        <input type="number" id="currentPageFeedback" min="1" value="1" style="width: 60px; text-align: center;">
+                        <span>/ <span id="totalPagesFeedback">1</span></span>
+                        <button id="nextPageFeedback">다음</button>
+                    </div>
                 </div>
-            </main>
+            </div>
         </div>
     </div>
 
-    <!-- Add/Edit Rental Modal -->
-    <div id="rentalModal" class="tg-modal fixed inset-0 flex items-center justify-center hidden z-50">
-        <div class="tg-modal-content w-full max-w-4xl mx-4 max-h-screen overflow-y-auto">
-            <div class="draggable-modal bg-blue-500 text-white p-4 rounded-t-lg flex justify-between items-center">
-                <h3 class="text-lg font-bold"><i class="fas fa-edit mr-2"></i>대여 정보 수정</h3>
-                <button onclick="closeRentalModal()" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+    <!-- Rental Detail Modal -->
+    <div id="rentalDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>대여 정보 수정</h3>
+                <button class="close" style="float: right; background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
             </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Left Column -->
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">관리번호</label>
-                            <input type="text" id="editManagementNo" class="tg-input w-full">
+            <div class="modal-body">
+                <form id="rentalDetailForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>관리번호</label>
+                            <input type="text" id="editManagementNumber" class="form-control">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">제품시리얼</label>
-                            <input type="text" id="editProductSerial" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>제품시리얼</label>
+                            <input type="text" id="editProductSerial" class="form-control">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학교명</label>
-                            <input type="text" id="editSchoolName" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>학교명</label>
+                            <input type="text" id="editSchoolName" class="form-control">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학교급</label>
-                            <select id="editSchoolLevel" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>학교급</label>
+                            <select id="editSchoolLevel" class="form-control">
                                 <option value="초등학교">초등학교</option>
                                 <option value="중학교">중학교</option>
                                 <option value="고등학교">고등학교</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학생명</label>
-                            <input type="text" id="editStudentName" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>학생명</label>
+                            <input type="text" id="editStudentName" class="form-control">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">제품명</label>
-                            <input type="text" id="editProductName" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>제품명</label>
+                            <input type="text" id="editProductName" class="form-control">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">상태</label>
-                            <select id="editStatus" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>상태</label>
+                            <select id="editStatus" class="form-control">
                                 <option value="대여중">대여중</option>
                                 <option value="미 대여중">미 대여중</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">메모1</label>
-                            <input type="text" id="editMemo1" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>메모1</label>
+                            <input type="text" id="editMemo1" class="form-control">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">메모2</label>
-                            <input type="text" id="editMemo2" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>메모2</label>
+                            <input type="text" id="editMemo2" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>학생생년월일</label>
+                            <input type="date" id="editStudentBirth" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>학생연락처</label>
+                            <input type="text" id="editStudentPhone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>개인정보동의일자</label>
+                            <input type="date" id="editPrivacyDate" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>보호자명</label>
+                            <input type="text" id="editGuardianName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>관계</label>
+                            <input type="text" id="editRelationship" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>보호자연락처</label>
+                            <input type="text" id="editGuardianPhone" class="form-control">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>기타사항</label>
+                            <textarea id="editOtherNotes" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Accessories Section -->
+                    <div class="accessories-section">
+                        <h4 class="font-medium mb-3"><i class="fas fa-tools mr-2"></i>악세사리 관리</h4>
+                        <div class="accessories-grid">
+                            <div class="form-group">
+                                <label><i class="fas fa-plug mr-1"></i>충전기</label>
+                                <select id="editChargerStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-cable mr-1"></i>충전케이블</label>
+                                <select id="editCableStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-ethernet mr-1"></i>USB 랜 젠더</label>
+                                <select id="editUsbStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-mouse mr-1"></i>마우스</label>
+                                <select id="editMouseStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-bag mr-1"></i>가방</label>
+                                <select id="editBagStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-mobile-alt mr-1"></i>케이스</label>
+                                <select id="editCaseStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Right Column -->
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학생생년월일</label>
-                            <input type="date" id="editStudentBirth" class="tg-input w-full">
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="button" class="btn-success" onclick="saveRentalChanges()">저장</button>
+                        <button type="button" class="btn-danger" onclick="closeModal('rentalDetailModal')">취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Rental Modal -->
+    <div id="addRentalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>새 대여 추가</h3>
+                <button class="close" style="float: right; background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addRentalForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>관리번호</label>
+                            <input type="text" id="newManagementNumber" class="form-control" required>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학생연락처</label>
-                            <input type="tel" id="editStudentPhone" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>제품시리얼</label>
+                            <input type="text" id="newProductSerial" class="form-control" required>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">개인정보동의일자</label>
-                            <input type="date" id="editPrivacyDate" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>학교명</label>
+                            <input type="text" id="newSchoolName" class="form-control" required>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">보호자명</label>
-                            <input type="text" id="editGuardianName" class="tg-input w-full">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">관계</label>
-                            <select id="editRelationship" class="tg-input w-full">
-                                <option value="부모">부모</option>
-                                <option value="조부모">조부모</option>
-                                <option value="기타">기타</option>
+                        <div class="form-group">
+                            <label>학교급</label>
+                            <select id="newSchoolLevel" class="form-control" required>
+                                <option value="">선택하세요</option>
+                                <option value="초등학교">초등학교</option>
+                                <option value="중학교">중학교</option>
+                                <option value="고등학교">고등학교</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">보호자연락처</label>
-                            <input type="tel" id="editGuardianPhone" class="tg-input w-full">
+                        <div class="form-group">
+                            <label>학생명</label>
+                            <input type="text" id="newStudentName" class="form-control" required>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">기타사항</label>
-                            <textarea id="editOtherInfo" class="tg-input w-full h-20" placeholder="기타 사항을 입력하세요"></textarea>
+                        <div class="form-group">
+                            <label>제품명</label>
+                            <input type="text" id="newProductName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>메모1</label>
+                            <input type="text" id="newMemo1" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>메모2</label>
+                            <input type="text" id="newMemo2" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>학생생년월일</label>
+                            <input type="date" id="newStudentBirth" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>학생연락처</label>
+                            <input type="text" id="newStudentPhone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>개인정보동의일자</label>
+                            <input type="date" id="newPrivacyDate" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>보호자명</label>
+                            <input type="text" id="newGuardianName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>관계</label>
+                            <input type="text" id="newRelationship" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>보호자연락처</label>
+                            <input type="text" id="newGuardianPhone" class="form-control">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>기타사항</label>
+                            <textarea id="newOtherNotes" class="form-control" rows="3"></textarea>
                         </div>
                     </div>
-                </div>
 
-                <!-- Accessories Management -->
-                <div class="mt-6">
-                    <h4 class="text-lg font-bold text-blue-600 mb-4">
-                        <i class="fas fa-tools mr-2"></i>악세사리 관리
-                    </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-plug mr-1"></i>충전기
-                            </label>
-                            <select id="editCharger" class="tg-input w-full">
-                                <option value="양호">양호</option>
-                                <option value="훼손">훼손</option>
-                                <option value="완파">완파</option>
-                                <option value="분실">분실</option>
-                                <option value="초기미포함">초기미포함</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-cable-car mr-1"></i>충전케이블
-                            </label>
-                            <select id="editChargingCable" class="tg-input w-full">
-                                <option value="양호">양호</option>
-                                <option value="훼손">훼손</option>
-                                <option value="완파">완파</option>
-                                <option value="분실">분실</option>
-                                <option value="초기미포함">초기미포함</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-ethernet mr-1"></i>USB 랜 젠더
-                            </label>
-                            <select id="editUsbAdapter" class="tg-input w-full">
-                                <option value="양호">양호</option>
-                                <option value="훼손">훼손</option>
-                                <option value="완파">완파</option>
-                                <option value="분실">분실</option>
-                                <option value="초기미포함">초기미포함</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-mouse mr-1"></i>마우스
-                            </label>
-                            <select id="editMouse" class="tg-input w-full">
-                                <option value="양호">양호</option>
-                                <option value="훼손">훼손</option>
-                                <option value="완파">완파</option>
-                                <option value="분실">분실</option>
-                                <option value="초기미포함">초기미포함</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-suitcase mr-1"></i>가방
-                            </label>
-                            <select id="editBag" class="tg-input w-full">
-                                <option value="양호">양호</option>
-                                <option value="훼손">훼손</option>
-                                <option value="완파">완파</option>
-                                <option value="분실">분실</option>
-                                <option value="초기미포함">초기미포함</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-mobile-alt mr-1"></i>케이스
-                            </label>
-                            <select id="editCase" class="tg-input w-full">
-                                <option value="양호">양호</option>
-                                <option value="훼손">훼손</option>
-                                <option value="완파">완파</option>
-                                <option value="분실">분실</option>
-                                <option value="초기미포함">초기미포함</option>
-                            </select>
+                    <!-- Accessories Section -->
+                    <div class="accessories-section">
+                        <h4 class="font-medium mb-3"><i class="fas fa-tools mr-2"></i>악세사리 관리</h4>
+                        <div class="accessories-grid">
+                            <div class="form-group">
+                                <label><i class="fas fa-plug mr-1"></i>충전기</label>
+                                <select id="newChargerStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-cable mr-1"></i>충전케이블</label>
+                                <select id="newCableStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-ethernet mr-1"></i>USB 랜 젠더</label>
+                                <select id="newUsbStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-mouse mr-1"></i>마우스</label>
+                                <select id="newMouseStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-bag mr-1"></i>가방</label>
+                                <select id="newBagStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-mobile-alt mr-1"></i>케이스</label>
+                                <select id="newCaseStatus" class="form-control">
+                                    <option value="양호">양호</option>
+                                    <option value="훼손">훼손</option>
+                                    <option value="완파">완파</option>
+                                    <option value="분실">분실</option>
+                                    <option value="초기미포함">초기미포함</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="flex gap-2 mt-6">
-                    <button onclick="saveRental()" class="tg-btn-primary">
-                        <i class="fas fa-save mr-2"></i>저장
-                    </button>
-                    <button onclick="closeRentalModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>취소
-                    </button>
-                </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="submit" class="btn-success">저장</button>
+                        <button type="button" class="btn-danger" onclick="closeModal('addRentalModal')">취소</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Add Product Modal -->
-    <div id="productModal" class="tg-modal fixed inset-0 flex items-center justify-center hidden z-50">
-        <div class="tg-modal-content w-full max-w-md mx-4">
-            <div class="draggable-modal bg-blue-500 text-white p-4 rounded-t-lg flex justify-between items-center">
-                <h3 class="text-lg font-bold"><i class="fas fa-plus mr-2"></i>제품 추가</h3>
-                <button onclick="closeProductModal()" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+    <!-- Other Modals -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>제품 추가</h3>
+                <button class="close" style="float: right; background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
             </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">차수</label>
-                    <select id="newProductPhase" class="tg-input w-full">
-                        <option value="1차">1차</option>
-                        <option value="2차">2차</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">관리번호</label>
-                    <input type="text" id="newProductMgmtNo" class="tg-input w-full">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">제품명</label>
-                    <input type="text" id="newProductName" class="tg-input w-full">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">시리얼</label>
-                    <input type="text" id="newProductSerial" class="tg-input w-full">
-                </div>
-                <div class="flex gap-2 mt-6">
-                    <button onclick="saveProduct()" class="tg-btn-success flex-1">
-                        <i class="fas fa-save mr-2"></i>저장
-                    </button>
-                    <button onclick="closeProductModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>취소
-                    </button>
-                </div>
+            <div class="modal-body">
+                <form id="addProductForm">
+                    <div class="form-group">
+                        <label>차수</label>
+                        <select id="newPhase" class="form-control" required>
+                            <option value="">선택하세요</option>
+                            <option value="1차">1차</option>
+                            <option value="2차">2차</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>관리번호</label>
+                        <input type="text" id="newProductManagementNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>제품명</label>
+                        <input type="text" id="newProductNameAdd" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>시리얼</label>
+                        <input type="text" id="newProductSerialAdd" class="form-control" required>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="submit" class="btn-success">저장</button>
+                        <button type="button" class="btn-danger" onclick="closeModal('addProductModal')">취소</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Add User Modal -->
-    <div id="userModal" class="tg-modal fixed inset-0 flex items-center justify-center hidden z-50">
-        <div class="tg-modal-content w-full max-w-md mx-4">
-            <div class="draggable-modal bg-blue-500 text-white p-4 rounded-t-lg flex justify-between items-center">
-                <h3 class="text-lg font-bold"><i class="fas fa-user-plus mr-2"></i>사용자 추가</h3>
-                <button onclick="closeUserModal()" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>사용자 추가</h3>
+                <button class="close" style="float: right; background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
             </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">사용자명</label>
-                    <input type="text" id="newUsername" class="tg-input w-full">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
-                    <input type="password" id="newUserPassword" class="tg-input w-full">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">권한</label>
-                    <select id="newUserRole" class="tg-input w-full">
-                        <option value="사용자">사용자</option>
-                        <option value="관리자">관리자</option>
-                        <option value="최고관리자">최고관리자</option>
-                    </select>
-                </div>
-                <div class="flex gap-2 mt-6">
-                    <button onclick="saveUser()" class="tg-btn-success flex-1">
-                        <i class="fas fa-save mr-2"></i>추가
-                    </button>
-                    <button onclick="closeUserModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>취소
-                    </button>
-                </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="form-group">
+                        <label>사용자명</label>
+                        <input type="text" id="newUsername" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>비밀번호</label>
+                        <input type="password" id="newUserPassword" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>권한</label>
+                        <select id="newUserRole" class="form-control" required>
+                            <option value="">선택하세요</option>
+                            <option value="최고관리자">최고관리자</option>
+                            <option value="관리자">관리자</option>
+                            <option value="사용자">사용자</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="submit" class="btn-success">저장</button>
+                        <button type="button" class="btn-danger" onclick="closeModal('addUserModal')">취소</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Add Post Modal -->
-    <div id="postModal" class="tg-modal fixed inset-0 flex items-center justify-center hidden z-50">
-        <div class="tg-modal-content w-full max-w-2xl mx-4">
-            <div class="draggable-modal bg-blue-500 text-white p-4 rounded-t-lg flex justify-between items-center">
-                <h3 class="text-lg font-bold"><i class="fas fa-pen mr-2"></i>새 글 작성</h3>
-                <button onclick="closePostModal()" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+    <div id="addFeedbackModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>새 글 작성</h3>
+                <button class="close" style="float: right; background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
             </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">제목</label>
-                    <input type="text" id="newPostTitle" class="tg-input w-full">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">내용</label>
-                    <textarea id="newPostContent" class="tg-input w-full h-40"></textarea>
-                </div>
-                <div class="flex gap-2 mt-6">
-                    <button onclick="savePost()" class="tg-btn-success flex-1">
-                        <i class="fas fa-save mr-2"></i>작성
-                    </button>
-                    <button onclick="closePostModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>취소
-                    </button>
-                </div>
+            <div class="modal-body">
+                <form id="addFeedbackForm">
+                    <div class="form-group">
+                        <label>제목</label>
+                        <input type="text" id="newFeedbackTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>내용</label>
+                        <textarea id="newFeedbackContent" class="form-control" rows="10" required></textarea>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="submit" class="btn-success">저장</button>
+                        <button type="button" class="btn-danger" onclick="closeModal('addFeedbackModal')">취소</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+
+    <!-- File Upload Input -->
+    <input type="file" id="fileUpload" accept=".xlsx,.xls" style="display: none;">
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "your-api-key",
-            authDomain: "your-project.firebaseapp.com",
-            databaseURL: "https://your-project-default-rtdb.firebaseio.com/",
-            projectId: "your-project",
-            storageBucket: "your-project.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "your-app-id"
-        };
+        // Google Sheets API Configuration
+        const SHEETS_API_KEY = 'AIzaSyAktuKM0rhd6GJJsvJjaFlhAVCB3poklxY';
+        const SPREADSHEET_ID = '1HnnVFEa8pNEdiaEE-7DmECqtq-hOUJI_8VB4y8ojLHg';
 
-        // Initialize Firebase (for demo purposes, using localStorage)
-        let firebase = {
-            database: () => ({
-                ref: (path) => ({
-                    push: (data) => {
-                        const items = JSON.parse(localStorage.getItem(path) || '[]');
-                        const id = Date.now().toString();
-                        items.push({...data, id});
-                        localStorage.setItem(path, JSON.stringify(items));
-                        return Promise.resolve({key: id});
-                    },
-                    once: (event) => {
-                        const items = JSON.parse(localStorage.getItem(path) || '[]');
-                        return Promise.resolve({val: () => items});
-                    },
-                    set: (data) => {
-                        localStorage.setItem(path, JSON.stringify(data));
-                        return Promise.resolve();
-                    },
-                    remove: () => {
-                        localStorage.removeItem(path);
-                        return Promise.resolve();
-                    }
-                })
-            })
+        // Sheet Names
+        const SHEETS = {
+            PRODUCTS: '제품관리',
+            RENTALS: '대여관리',
+            USERS: '사용자관리',
+            FEEDBACK: '피드백'
         };
 
         // Global Variables
         let currentUser = null;
-        let currentPage = 'rental';
-        let rentalData = [];
-        let productData = [];
-        let userData = [];
-        let feedbackData = [];
+        let currentUserRole = null;
+        let allRentals = [];
+        let allProducts = [];
+        let allUsers = [];
+        let allFeedback = [];
+        let filteredRentals = [];
+        let filteredProducts = [];
         let currentRentalPage = 1;
         let currentProductPage = 1;
-        let itemsPerPage = 20;
-        let editingRentalId = null;
-        let editingProductId = null;
+        let currentFeedbackPage = 1;
+        const itemsPerPage = 20;
 
-        // Initialize System
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeUsers();
-            loadData();
-            updateTime();
-            setInterval(updateTime, 1000);
-            makeDraggable();
-        });
+        // Initialize Google Sheets API
+        function initGoogleSheetsAPI() {
+            gapi.load('client', async () => {
+                await gapi.client.init({
+                    apiKey: SHEETS_API_KEY,
+                    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
+                });
+                console.log('Google Sheets API initialized');
+            });
+        }
 
-        // Initialize default users
-        function initializeUsers() {
-            const defaultUsers = [
-                {id: '1', username: 'admin', password: 'admin123', role: '최고관리자', createdAt: '2024-01-01'},
-                {id: '2', username: 'manager', password: 'manager123', role: '관리자', createdAt: '2024-01-02'},
-                {id: '3', username: 'user', password: 'user123', role: '사용자', createdAt: '2024-01-03'}
-            ];
-            
-            const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-            if (existingUsers.length === 0) {
-                localStorage.setItem('users', JSON.stringify(defaultUsers));
+        // Google Sheets API Functions
+        async function readSheet(sheetName, range = 'A:Z') {
+            try {
+                const response = await gapi.client.sheets.spreadsheets.values.get({
+                    spreadsheetId: SPREADSHEET_ID,
+                    range: `${sheetName}!${range}`
+                });
+                return response.result.values || [];
+            } catch (error) {
+                console.error('Error reading sheet:', error);
+                return [];
             }
         }
 
-        // Login functionality
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const user = users.find(u => u.username === username && u.password === password);
-            
-            if (user) {
-                currentUser = user;
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainSystem').classList.remove('hidden');
-                document.getElementById('currentUser').textContent = `${user.role}: ${user.username}`;
-                
-                // Set permissions based on role
-                if (user.role === '사용자') {
-                    document.getElementById('userManagementMenu').style.display = 'none';
-                    // Hide edit buttons and restrict functionality
-                }
-                
-                loadData();
-                updateDashboard();
-            } else {
-                alert('잘못된 로그인 정보입니다.');
+        async function writeSheet(sheetName, values, range = 'A1') {
+            try {
+                const response = await gapi.client.sheets.spreadsheets.values.update({
+                    spreadsheetId: SPREADSHEET_ID,
+                    range: `${sheetName}!${range}`,
+                    valueInputOption: 'RAW',
+                    resource: {
+                        values: values
+                    }
+                });
+                return response.result;
+            } catch (error) {
+                console.error('Error writing sheet:', error);
+                return null;
             }
-        });
+        }
 
-        // Logout functionality
+        async function appendSheet(sheetName, values) {
+            try {
+                const response = await gapi.client.sheets.spreadsheets.values.append({
+                    spreadsheetId: SPREADSHEET_ID,
+                    range: `${sheetName}!A1`,
+                    valueInputOption: 'RAW',
+                    insertDataOption: 'INSERT_ROWS',
+                    resource: {
+                        values: values
+                    }
+                });
+                return response.result;
+            } catch (error) {
+                console.error('Error appending to sheet:', error);
+                return null;
+            }
+        }
+
+        // Authentication Functions
+        function login(username, password) {
+            const users = {
+                'admin': { password: 'admin123', role: '최고관리자' },
+                'manager': { password: 'manager123', role: '관리자' },
+                'user': { password: 'user123', role: '사용자' }
+            };
+
+            if (users[username] && users[username].password === password) {
+                currentUser = username;
+                currentUserRole = users[username].role;
+                localStorage.setItem('currentUser', username);
+                localStorage.setItem('currentUserRole', currentUserRole);
+                return true;
+            }
+            return false;
+        }
+
         function logout() {
             currentUser = null;
+            currentUserRole = null;
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('currentUserRole');
+            showLoginScreen();
+        }
+
+        function checkAuth() {
+            const savedUser = localStorage.getItem('currentUser');
+            const savedRole = localStorage.getItem('currentUserRole');
+            if (savedUser && savedRole) {
+                currentUser = savedUser;
+                currentUserRole = savedRole;
+                return true;
+            }
+            return false;
+        }
+
+        // UI Functions
+        function showLoginScreen() {
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('mainSystem').classList.add('hidden');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
         }
 
-        // Update current time
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleString('ko-KR');
-            document.getElementById('currentTime').textContent = timeString;
+        function showMainSystem() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainSystem').classList.remove('hidden');
+            document.getElementById('currentUser').textContent = `${currentUser} (${currentUserRole})`;
+            
+            // Hide admin-only elements based on role
+            const adminElements = document.querySelectorAll('.admin-only');
+            adminElements.forEach(el => {
+                if (currentUserRole !== '최고관리자') {
+                    el.style.display = 'none';
+                } else {
+                    el.style.display = '';
+                }
+            });
+
+            showPage('rental');
+            loadAllData();
         }
 
-        // Page navigation
-        function showPage(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(page + 'Page').classList.remove('hidden');
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
             
-            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            event.target.classList.add('active');
+            // Show selected page
+            document.getElementById(pageId + 'Page').classList.remove('hidden');
             
-            currentPage = page;
-            
-            if (page === 'rental') {
-                loadRentalData();
-                updateDashboard();
-            } else if (page === 'products') {
-                loadProductData();
-            } else if (page === 'users') {
-                loadUserData();
-            } else if (page === 'feedback') {
-                loadFeedbackData();
+            // Update menu active state
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('bg-white', 'shadow-sm');
+            });
+            document.querySelector(`[data-page="${pageId}"]`).classList.add('bg-white', 'shadow-sm');
+
+            // Load page-specific data
+            switch(pageId) {
+                case 'rental':
+                    renderRentalTable();
+                    updateDashboard();
+                    break;
+                case 'products':
+                    renderProductTable();
+                    break;
+                case 'users':
+                    renderUserTable();
+                    break;
+                case 'feedback':
+                    renderFeedbackTable();
+                    break;
             }
         }
 
-        // Load all data
-        function loadData() {
-            rentalData = JSON.parse(localStorage.getItem('rentals') || '[]');
-            productData = JSON.parse(localStorage.getItem('products') || '[]');
-            userData = JSON.parse(localStorage.getItem('users') || '[]');
-            feedbackData = JSON.parse(localStorage.getItem('feedback') || '[]');
+        // Data Loading Functions
+        async function loadAllData() {
+            try {
+                // Load products
+                const productData = await readSheet(SHEETS.PRODUCTS);
+                if (productData.length > 1) {
+                    allProducts = productData.slice(1).map((row, index) => ({
+                        id: index + 1,
+                        phase: row[0] || '',
+                        managementNumber: row[1] || '',
+                        productName: row[2] || '',
+                        serial: row[3] || ''
+                    }));
+                }
+
+                // Load rentals
+                const rentalData = await readSheet(SHEETS.RENTALS);
+                if (rentalData.length > 1) {
+                    allRentals = rentalData.slice(1).map((row, index) => ({
+                        id: index + 1,
+                        managementNumber: row[1] || '',
+                        productSerial: row[2] || '',
+                        schoolName: row[3] || '',
+                        schoolLevel: row[4] || '',
+                        studentName: row[5] || '',
+                        status: row[6] || '대여중',
+                        memo1: row[7] || '',
+                        memo2: row[8] || '',
+                        studentBirth: row[9] || '',
+                        studentPhone: row[10] || '',
+                        privacyDate: row[11] || '',
+                        guardianName: row[12] || '',
+                        relationship: row[13] || '',
+                        guardianPhone: row[14] || '',
+                        otherNotes: row[15] || '',
+                        chargerStatus: row[16] || '양호',
+                        cableStatus: row[17] || '양호',
+                        usbStatus: row[18] || '양호',
+                        mouseStatus: row[19] || '양호',
+                        bagStatus: row[20] || '양호',
+                        caseStatus: row[21] || '양호'
+                    }));
+                }
+
+                // Load users
+                const userData = await readSheet(SHEETS.USERS);
+                if (userData.length > 1) {
+                    allUsers = userData.slice(1).map((row, index) => ({
+                        id: index + 1,
+                        username: row[0] || '',
+                        role: row[1] || '',
+                        createdDate: row[2] || new Date().toISOString().split('T')[0]
+                    }));
+                }
+
+                // Load feedback
+                const feedbackData = await readSheet(SHEETS.FEEDBACK);
+                if (feedbackData.length > 1) {
+                    allFeedback = feedbackData.slice(1).map((row, index) => ({
+                        id: index + 1,
+                        title: row[1] || '',
+                        content: row[2] || '',
+                        author: row[3] || '',
+                        createdDate: row[4] || '',
+                        views: parseInt(row[5]) || 0
+                    }));
+                }
+
+                // Update all displays
+                filteredRentals = [...allRentals];
+                filteredProducts = [...allProducts];
+                updateModelFilter();
+                updateDashboard();
+                renderRentalTable();
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
         }
 
-        // Dashboard updates
+        // Rental Functions
         function updateDashboard() {
-            const firstEquip = productData.filter(p => p.phase === '1차').length;
-            const secondEquip = productData.filter(p => p.phase === '2차').length;
-            const rented = rentalData.filter(r => r.status === '대여중').length;
-            const available = rentalData.filter(r => r.status === '미 대여중').length;
-            
-            document.getElementById('firstEquipCount').textContent = firstEquip;
-            document.getElementById('secondEquipCount').textContent = secondEquip;
-            document.getElementById('rentedCount').textContent = rented;
-            document.getElementById('availableCount').textContent = available;
+            const phase1Count = allProducts.filter(p => p.phase === '1차').length;
+            const phase2Count = allProducts.filter(p => p.phase === '2차').length;
+            const rentalCount = allRentals.filter(r => r.status === '대여중').length;
+            const availableCount = allRentals.filter(r => r.status === '미 대여중').length;
+
+            document.getElementById('phase1Count').textContent = phase1Count;
+            document.getElementById('phase2Count').textContent = phase2Count;
+            document.getElementById('rentalCount').textContent = rentalCount;
+            document.getElementById('availableCount').textContent = availableCount;
         }
 
-        // Rental Management Functions
-        function loadRentalData() {
-            const tbody = document.getElementById('rentalTableBody');
-            const startIndex = (currentRentalPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageData = rentalData.slice(startIndex, endIndex);
+        function updateModelFilter() {
+            const modelFilter = document.getElementById('modelFilter');
+            const models = [...new Set(allProducts.map(p => p.productName))];
             
+            modelFilter.innerHTML = '<option value="">전체 모델</option>';
+            models.forEach(model => {
+                if (model) {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    modelFilter.appendChild(option);
+                }
+            });
+        }
+
+        function searchRentals() {
+            const searchText = document.getElementById('rentalSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const phaseFilter = document.getElementById('phaseFilter').value;
+            const modelFilter = document.getElementById('modelFilter').value;
+            const dateStart = document.getElementById('dateStart').value;
+            const dateEnd = document.getElementById('dateEnd').value;
+
+            filteredRentals = allRentals.filter(rental => {
+                const matchesSearch = !searchText || 
+                    rental.managementNumber.toLowerCase().includes(searchText) ||
+                    rental.schoolName.toLowerCase().includes(searchText) ||
+                    rental.studentName.toLowerCase().includes(searchText) ||
+                    rental.productSerial.toLowerCase().includes(searchText);
+
+                const matchesStatus = !statusFilter || rental.status === statusFilter;
+
+                // Find product for phase and model filtering
+                const product = allProducts.find(p => p.serial === rental.productSerial);
+                const matchesPhase = !phaseFilter || (product && product.phase === phaseFilter);
+                const matchesModel = !modelFilter || (product && product.productName === modelFilter);
+
+                const matchesDateRange = (!dateStart || !dateEnd) || 
+                    (rental.privacyDate >= dateStart && rental.privacyDate <= dateEnd);
+
+                return matchesSearch && matchesStatus && matchesPhase && matchesModel && matchesDateRange;
+            });
+
+            currentRentalPage = 1;
+            renderRentalTable();
+        }
+
+        function renderRentalTable() {
+            const tbody = document.getElementById('rentalTableBody');
+            const start = (currentRentalPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredRentals.slice(start, end);
+
             tbody.innerHTML = '';
+
             pageData.forEach((rental, index) => {
+                const product = allProducts.find(p => p.serial === rental.productSerial);
+                const productName = product ? product.productName : rental.productSerial;
+
                 const row = document.createElement('tr');
-                row.className = 'border-b hover:bg-gray-50';
                 row.innerHTML = `
-                    <td class="px-4 py-3">
-                        <input type="checkbox" data-id="${rental.id}">
-                    </td>
-                    <td class="px-4 py-3">${startIndex + index + 1}</td>
-                    <td class="px-4 py-3">
-                        <a href="#" onclick="editRental('${rental.id}')" class="text-blue-600 hover:underline">
-                            ${rental.managementNo || '-'}
-                        </a>
-                    </td>
-                    <td class="px-4 py-3">${rental.productSerial || '-'}</td>
-                    <td class="px-4 py-3">${rental.schoolName || '-'}</td>
-                    <td class="px-4 py-3">${rental.schoolLevel || '-'}</td>
-                    <td class="px-4 py-3">${rental.studentName || '-'}</td>
-                    <td class="px-4 py-3">${rental.productName || '-'}</td>
-                    <td class="px-4 py-3">
-                        <select onchange="updateRentalStatus('${rental.id}', this.value)" class="text-sm rounded px-2 py-1 ${rental.status === '대여중' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
-                            <option value="대여중" ${rental.status === '대여중' ? 'selected' : ''}>대여중</option>
-                            <option value="미 대여중" ${rental.status === '미 대여중' ? 'selected' : ''}>미 대여중</option>
-                        </select>
-                    </td>
-                    <td class="px-4 py-3">${rental.memo1 || '-'}</td>
-                    <td class="px-4 py-3">${rental.memo2 || '-'}</td>
-                    <td class="px-4 py-3">
-                        <button onclick="deleteRental('${rental.id}')" class="text-red-600 hover:text-red-800">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
+                    <td><input type="checkbox" class="rental-checkbox" data-id="${rental.id}"></td>
+                    <td>${start + index + 1}</td>
+                    <td><a href="#" class="text-blue-600 hover:underline" onclick="openRentalDetail(${rental.id})">${rental.managementNumber}</a></td>
+                    <td>${rental.productSerial}</td>
+                    <td>${rental.schoolName}</td>
+                    <td>${rental.schoolLevel}</td>
+                    <td>${rental.studentName}</td>
+                    <td>${productName}</td>
+                    <td><span class="status-badge ${rental.status === '대여중' ? 'status-rental' : 'status-available'}">${rental.status}</span></td>
+                    <td>${rental.memo1}</td>
+                    <td>${rental.memo2}</td>
+                    <td>${rental.otherNotes}</td>
                 `;
                 tbody.appendChild(row);
             });
+
+            // Update pagination
+            const totalPages = Math.ceil(filteredRentals.length / itemsPerPage);
+            document.getElementById('currentPageRental').value = currentRentalPage;
+            document.getElementById('totalPagesRental').textContent = totalPages;
+            document.getElementById('prevPageRental').disabled = currentRentalPage === 1;
+            document.getElementById('nextPageRental').disabled = currentRentalPage === totalPages;
+        }
+
+        function openRentalDetail(id) {
+            const rental = allRentals.find(r => r.id === id);
+            if (!rental) return;
+
+            // Populate form fields
+            document.getElementById('editManagementNumber').value = rental.managementNumber;
+            document.getElementById('editProductSerial').value = rental.productSerial;
+            document.getElementById('editSchoolName').value = rental.schoolName;
+            document.getElementById('editSchoolLevel').value = rental.schoolLevel;
+            document.getElementById('editStudentName').value = rental.studentName;
             
-            updateRentalPagination();
-        }
-
-        function updateRentalPagination() {
-            const totalPages = Math.ceil(rentalData.length / itemsPerPage);
-            document.getElementById('rentalCurrentPage').value = currentRentalPage;
-            document.getElementById('rentalTotalPages').textContent = totalPages;
-        }
-
-        function showAddRentalModal() {
-            editingRentalId = null;
-            clearRentalForm();
-            document.getElementById('rentalModal').classList.remove('hidden');
-        }
-
-        function editRental(id) {
-            editingRentalId = id;
-            const rental = rentalData.find(r => r.id === id);
-            if (rental) {
-                fillRentalForm(rental);
-                document.getElementById('rentalModal').classList.remove('hidden');
-            }
-        }
-
-        function fillRentalForm(rental) {
-            document.getElementById('editManagementNo').value = rental.managementNo || '';
-            document.getElementById('editProductSerial').value = rental.productSerial || '';
-            document.getElementById('editSchoolName').value = rental.schoolName || '';
-            document.getElementById('editSchoolLevel').value = rental.schoolLevel || '';
-            document.getElementById('editStudentName').value = rental.studentName || '';
-            document.getElementById('editProductName').value = rental.productName || '';
-            document.getElementById('editStatus').value = rental.status || '대여중';
-            document.getElementById('editMemo1').value = rental.memo1 || '';
-            document.getElementById('editMemo2').value = rental.memo2 || '';
-            document.getElementById('editStudentBirth').value = rental.studentBirth || '';
-            document.getElementById('editStudentPhone').value = rental.studentPhone || '';
-            document.getElementById('editPrivacyDate').value = rental.privacyDate || '';
-            document.getElementById('editGuardianName').value = rental.guardianName || '';
-            document.getElementById('editRelationship').value = rental.relationship || '';
-            document.getElementById('editGuardianPhone').value = rental.guardianPhone || '';
-            document.getElementById('editOtherInfo').value = rental.otherInfo || '';
+            const product = allProducts.find(p => p.serial === rental.productSerial);
+            document.getElementById('editProductName').value = product ? product.productName : '';
             
-            // Accessories
-            document.getElementById('editCharger').value = rental.charger || '양호';
-            document.getElementById('editChargingCable').value = rental.chargingCable || '양호';
-            document.getElementById('editUsbAdapter').value = rental.usbAdapter || '양호';
-            document.getElementById('editMouse').value = rental.mouse || '양호';
-            document.getElementById('editBag').value = rental.bag || '양호';
-            document.getElementById('editCase').value = rental.case || '양호';
-        }
+            document.getElementById('editStatus').value = rental.status;
+            document.getElementById('editMemo1').value = rental.memo1;
+            document.getElementById('editMemo2').value = rental.memo2;
+            document.getElementById('editStudentBirth').value = rental.studentBirth;
+            document.getElementById('editStudentPhone').value = rental.studentPhone;
+            document.getElementById('editPrivacyDate').value = rental.privacyDate;
+            document.getElementById('editGuardianName').value = rental.guardianName;
+            document.getElementById('editRelationship').value = rental.relationship;
+            document.getElementById('editGuardianPhone').value = rental.guardianPhone;
+            document.getElementById('editOtherNotes').value = rental.otherNotes;
 
-        function clearRentalForm() {
-            document.getElementById('editManagementNo').value = '';
-            document.getElementById('editProductSerial').value = '';
-            document.getElementById('editSchoolName').value = '';
-            document.getElementById('editSchoolLevel').value = '초등학교';
-            document.getElementById('editStudentName').value = '';
-            document.getElementById('editProductName').value = '';
-            document.getElementById('editStatus').value = '대여중';
-            document.getElementById('editMemo1').value = '';
-            document.getElementById('editMemo2').value = '';
-            document.getElementById('editStudentBirth').value = '';
-            document.getElementById('editStudentPhone').value = '';
-            document.getElementById('editPrivacyDate').value = '';
-            document.getElementById('editGuardianName').value = '';
-            document.getElementById('editRelationship').value = '부모';
-            document.getElementById('editGuardianPhone').value = '';
-            document.getElementById('editOtherInfo').value = '';
+            // Populate accessories
+            document.getElementById('editChargerStatus').value = rental.chargerStatus;
+            document.getElementById('editCableStatus').value = rental.cableStatus;
+            document.getElementById('editUsbStatus').value = rental.usbStatus;
+            document.getElementById('editMouseStatus').value = rental.mouseStatus;
+            document.getElementById('editBagStatus').value = rental.bagStatus;
+            document.getElementById('editCaseStatus').value = rental.caseStatus;
+
+            // Store current editing ID
+            document.getElementById('rentalDetailModal').dataset.editingId = id;
             
-            // Reset accessories to default
-            document.getElementById('editCharger').value = '양호';
-            document.getElementById('editChargingCable').value = '양호';
-            document.getElementById('editUsbAdapter').value = '양호';
-            document.getElementById('editMouse').value = '양호';
-            document.getElementById('editBag').value = '양호';
-            document.getElementById('editCase').value = '양호';
+            openModal('rentalDetailModal');
         }
 
-        function saveRental() {
-            const rental = {
-                managementNo: document.getElementById('editManagementNo').value,
-                productSerial: document.getElementById('editProductSerial').value,
-                schoolName: document.getElementById('editSchoolName').value,
-                schoolLevel: document.getElementById('editSchoolLevel').value,
-                studentName: document.getElementById('editStudentName').value,
-                productName: document.getElementById('editProductName').value,
-                status: document.getElementById('editStatus').value,
-                memo1: document.getElementById('editMemo1').value,
-                memo2: document.getElementById('editMemo2').value,
-                studentBirth: document.getElementById('editStudentBirth').value,
-                studentPhone: document.getElementById('editStudentPhone').value,
-                privacyDate: document.getElementById('editPrivacyDate').value,
-                guardianName: document.getElementById('editGuardianName').value,
-                relationship: document.getElementById('editRelationship').value,
-                guardianPhone: document.getElementById('editGuardianPhone').value,
-                otherInfo: document.getElementById('editOtherInfo').value,
-                charger: document.getElementById('editCharger').value,
-                chargingCable: document.getElementById('editChargingCable').value,
-                usbAdapter: document.getElementById('editUsbAdapter').value,
-                mouse: document.getElementById('editMouse').value,
-                bag: document.getElementById('editBag').value,
-                case: document.getElementById('editCase').value,
-                updatedAt: new Date().toISOString()
-            };
+        async function saveRentalChanges() {
+            const editingId = parseInt(document.getElementById('rentalDetailModal').dataset.editingId);
+            const rentalIndex = allRentals.findIndex(r => r.id === editingId);
+            
+            if (rentalIndex === -1) return;
 
-            if (editingRentalId) {
-                const index = rentalData.findIndex(r => r.id === editingRentalId);
-                if (index !== -1) {
-                    rentalData[index] = {...rentalData[index], ...rental};
-                }
-            } else {
-                rental.id = Date.now().toString();
-                rental.createdAt = new Date().toISOString();
-                rentalData.push(rental);
-            }
+            // Update rental object
+            const rental = allRentals[rentalIndex];
+            rental.managementNumber = document.getElementById('editManagementNumber').value;
+            rental.productSerial = document.getElementById('editProductSerial').value;
+            rental.schoolName = document.getElementById('editSchoolName').value;
+            rental.schoolLevel = document.getElementById('editSchoolLevel').value;
+            rental.studentName = document.getElementById('editStudentName').value;
+            rental.status = document.getElementById('editStatus').value;
+            rental.memo1 = document.getElementById('editMemo1').value;
+            rental.memo2 = document.getElementById('editMemo2').value;
+            rental.studentBirth = document.getElementById('editStudentBirth').value;
+            rental.studentPhone = document.getElementById('editStudentPhone').value;
+            rental.privacyDate = document.getElementById('editPrivacyDate').value;
+            rental.guardianName = document.getElementById('editGuardianName').value;
+            rental.relationship = document.getElementById('editRelationship').value;
+            rental.guardianPhone = document.getElementById('editGuardianPhone').value;
+            rental.otherNotes = document.getElementById('editOtherNotes').value;
+            rental.chargerStatus = document.getElementById('editChargerStatus').value;
+            rental.cableStatus = document.getElementById('editCableStatus').value;
+            rental.usbStatus = document.getElementById('editUsbStatus').value;
+            rental.mouseStatus = document.getElementById('editMouseStatus').value;
+            rental.bagStatus = document.getElementById('editBagStatus').value;
+            rental.caseStatus = document.getElementById('editCaseStatus').value;
 
-            localStorage.setItem('rentals', JSON.stringify(rentalData));
-            closeRentalModal();
-            loadRentalData();
+            // Update Google Sheets
+            const rowData = [
+                rental.id,
+                rental.managementNumber,
+                rental.productSerial,
+                rental.schoolName,
+                rental.schoolLevel,
+                rental.studentName,
+                rental.status,
+                rental.memo1,
+                rental.memo2,
+                rental.studentBirth,
+                rental.studentPhone,
+                rental.privacyDate,
+                rental.guardianName,
+                rental.relationship,
+                rental.guardianPhone,
+                rental.otherNotes,
+                rental.chargerStatus,
+                rental.cableStatus,
+                rental.usbStatus,
+                rental.mouseStatus,
+                rental.bagStatus,
+                rental.caseStatus
+            ];
+
+            await writeSheet(SHEETS.RENTALS, [rowData], `A${rentalIndex + 2}`);
+
+            closeModal('rentalDetailModal');
+            searchRentals();
             updateDashboard();
             alert('저장되었습니다.');
         }
 
-        function closeRentalModal() {
-            document.getElementById('rentalModal').classList.add('hidden');
-            editingRentalId = null;
-        }
-
-        function deleteRental(id) {
-            if (confirm('정말 삭제하시겠습니까?')) {
-                rentalData = rentalData.filter(r => r.id !== id);
-                localStorage.setItem('rentals', JSON.stringify(rentalData));
-                loadRentalData();
-                updateDashboard();
+        async function addNewRental() {
+            const form = document.getElementById('addRentalForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
             }
+
+            const newRental = {
+                id: allRentals.length + 1,
+                managementNumber: document.getElementById('newManagementNumber').value,
+                productSerial: document.getElementById('newProductSerial').value,
+                schoolName: document.getElementById('newSchoolName').value,
+                schoolLevel: document.getElementById('newSchoolLevel').value,
+                studentName: document.getElementById('newStudentName').value,
+                status: '대여중',
+                memo1: document.getElementById('newMemo1').value,
+                memo2: document.getElementById('newMemo2').value,
+                studentBirth: document.getElementById('newStudentBirth').value,
+                studentPhone: document.getElementById('newStudentPhone').value,
+                privacyDate: document.getElementById('newPrivacyDate').value,
+                guardianName: document.getElementById('newGuardianName').value,
+                relationship: document.getElementById('newRelationship').value,
+                guardianPhone: document.getElementById('newGuardianPhone').value,
+                otherNotes: document.getElementById('newOtherNotes').value,
+                chargerStatus: document.getElementById('newChargerStatus').value,
+                cableStatus: document.getElementById('newCableStatus').value,
+                usbStatus: document.getElementById('newUsbStatus').value,
+                mouseStatus: document.getElementById('newMouseStatus').value,
+                bagStatus: document.getElementById('newBagStatus').value,
+                caseStatus: document.getElementById('newCaseStatus').value
+            };
+
+            const rowData = [
+                newRental.id,
+                newRental.managementNumber,
+                newRental.productSerial,
+                newRental.schoolName,
+                newRental.schoolLevel,
+                newRental.studentName,
+                newRental.status,
+                newRental.memo1,
+                newRental.memo2,
+                newRental.studentBirth,
+                newRental.studentPhone,
+                newRental.privacyDate,
+                newRental.guardianName,
+                newRental.relationship,
+                newRental.guardianPhone,
+                newRental.otherNotes,
+                newRental.chargerStatus,
+                newRental.cableStatus,
+                newRental.usbStatus,
+                newRental.mouseStatus,
+                newRental.bagStatus,
+                newRental.caseStatus
+            ];
+
+            await appendSheet(SHEETS.RENTALS, [rowData]);
+            allRentals.push(newRental);
+
+            closeModal('addRentalModal');
+            form.reset();
+            searchRentals();
+            updateDashboard();
+            alert('저장되었습니다.');
         }
 
-        function updateRentalStatus(id, status) {
-            const rental = rentalData.find(r => r.id === id);
-            if (rental) {
-                rental.status = status;
-                localStorage.setItem('rentals', JSON.stringify(rentalData));
-                updateDashboard();
-            }
-        }
-
-        // Product Management Functions
-        function loadProductData() {
+        // Product Functions
+        function renderProductTable() {
             const tbody = document.getElementById('productTableBody');
-            const startIndex = (currentProductPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageData = productData.slice(startIndex, endIndex);
-            
+            const start = (currentProductPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredProducts.slice(start, end);
+
             tbody.innerHTML = '';
+
             pageData.forEach((product, index) => {
                 const row = document.createElement('tr');
-                row.className = 'border-b hover:bg-gray-50';
                 row.innerHTML = `
-                    <td class="px-4 py-3">
-                        <input type="checkbox" data-id="${product.id}">
-                    </td>
-                    <td class="px-4 py-3">${product.phase || '-'}</td>
-                    <td class="px-4 py-3">${product.managementNo || '-'}</td>
-                    <td class="px-4 py-3">${product.name || '-'}</td>
-                    <td class="px-4 py-3">${product.serial || '-'}</td>
-                    <td class="px-4 py-3">
-                        <button onclick="editProduct('${product.id}')" class="text-blue-600 hover:text-blue-800 mr-2">
+                    <td><input type="checkbox" class="product-checkbox" data-id="${product.id}"></td>
+                    <td>${product.phase}</td>
+                    <td>${product.managementNumber}</td>
+                    <td>${product.productName}</td>
+                    <td>${product.serial}</td>
+                    <td>
+                        <button class="btn-primary mr-1" onclick="editProduct(${product.id})">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button onclick="deleteProduct('${product.id}')" class="text-red-600 hover:text-red-800">
+                        <button class="btn-danger" onclick="deleteProduct(${product.id})">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
-            
-            updateProductPagination();
+
+            // Update pagination
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+            document.getElementById('currentPageProduct').value = currentProductPage;
+            document.getElementById('totalPagesProduct').value = totalPages;
+            document.getElementById('prevPageProduct').disabled = currentProductPage === 1;
+            document.getElementById('nextPageProduct').disabled = currentProductPage === totalPages;
         }
 
-        function updateProductPagination() {
-            const totalPages = Math.ceil(productData.length / itemsPerPage);
-            document.getElementById('productCurrentPage').value = currentProductPage;
-            document.getElementById('productTotalPages').textContent = totalPages;
-        }
-
-        function showAddProductModal() {
-            editingProductId = null;
-            clearProductForm();
-            document.getElementById('productModal').classList.remove('hidden');
-        }
-
-        function editProduct(id) {
-            editingProductId = id;
-            const product = productData.find(p => p.id === id);
-            if (product) {
-                fillProductForm(product);
-                document.getElementById('productModal').classList.remove('hidden');
+        async function addNewProduct() {
+            const form = document.getElementById('addProductForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
             }
-        }
 
-        function fillProductForm(product) {
-            document.getElementById('newProductPhase').value = product.phase || '1차';
-            document.getElementById('newProductMgmtNo').value = product.managementNo || '';
-            document.getElementById('newProductName').value = product.name || '';
-            document.getElementById('newProductSerial').value = product.serial || '';
-        }
-
-        function clearProductForm() {
-            document.getElementById('newProductPhase').value = '1차';
-            document.getElementById('newProductMgmtNo').value = '';
-            document.getElementById('newProductName').value = '';
-            document.getElementById('newProductSerial').value = '';
-        }
-
-        function saveProduct() {
-            const product = {
-                phase: document.getElementById('newProductPhase').value,
-                managementNo: document.getElementById('newProductMgmtNo').value,
-                name: document.getElementById('newProductName').value,
-                serial: document.getElementById('newProductSerial').value,
-                updatedAt: new Date().toISOString()
+            const newProduct = {
+                id: allProducts.length + 1,
+                phase: document.getElementById('newPhase').value,
+                managementNumber: document.getElementById('newProductManagementNumber').value,
+                productName: document.getElementById('newProductNameAdd').value,
+                serial: document.getElementById('newProductSerialAdd').value
             };
 
-            // Check for duplicates
-            const existing = productData.find(p => 
-                (p.managementNo === product.managementNo && product.managementNo) ||
-                (p.serial === product.serial && product.serial)
-            );
+            const rowData = [
+                newProduct.phase,
+                newProduct.managementNumber,
+                newProduct.productName,
+                newProduct.serial
+            ];
 
-            if (existing && (!editingProductId || existing.id !== editingProductId)) {
-                if (existing.managementNo === product.managementNo) {
-                    alert('이미 존재하는 관리번호입니다.');
-                    return;
-                }
-                if (existing.serial === product.serial) {
-                    alert('이미 존재하는 시리얼입니다.');
-                    return;
-                }
-            }
+            await appendSheet(SHEETS.PRODUCTS, [rowData]);
+            allProducts.push(newProduct);
 
-            if (editingProductId) {
-                const index = productData.findIndex(p => p.id === editingProductId);
-                if (index !== -1) {
-                    productData[index] = {...productData[index], ...product};
-                }
-            } else {
-                product.id = Date.now().toString();
-                product.createdAt = new Date().toISOString();
-                productData.push(product);
-            }
-
-            localStorage.setItem('products', JSON.stringify(productData));
-            closeProductModal();
-            loadProductData();
-            updateDashboard();
+            closeModal('addProductModal');
+            form.reset();
+            updateModelFilter();
+            renderProductTable();
             alert('저장되었습니다.');
         }
 
-        function closeProductModal() {
-            document.getElementById('productModal').classList.add('hidden');
-            editingProductId = null;
-        }
-
-        function deleteProduct(id) {
-            if (confirm('정말 삭제하시겠습니까?')) {
-                productData = productData.filter(p => p.id !== id);
-                localStorage.setItem('products', JSON.stringify(productData));
-                loadProductData();
-                updateDashboard();
-            }
-        }
-
-        // User Management Functions
-        function loadUserData() {
+        // User Functions
+        function renderUserTable() {
             const tbody = document.getElementById('userTableBody');
             tbody.innerHTML = '';
-            
-            userData.forEach(user => {
+
+            allUsers.forEach(user => {
                 const row = document.createElement('tr');
-                row.className = 'border-b hover:bg-gray-50';
-                
-                let roleColor = 'text-gray-600';
-                if (user.role === '최고관리자') roleColor = 'text-red-600';
-                else if (user.role === '관리자') roleColor = 'text-orange-600';
-                else if (user.role === '사용자') roleColor = 'text-green-600';
-                
                 row.innerHTML = `
-                    <td class="px-4 py-3">${user.username}</td>
-                    <td class="px-4 py-3"><span class="${roleColor}">${user.role}</span></td>
-                    <td class="px-4 py-3">${user.createdAt}</td>
-                    <td class="px-4 py-3">
-                        <button onclick="editUser('${user.id}')" class="text-blue-600 hover:text-blue-800 mr-2">
+                    <td>${user.username}</td>
+                    <td>${user.role}</td>
+                    <td>${user.createdDate}</td>
+                    <td>
+                        <button class="btn-primary mr-1" onclick="editUser(${user.id})">
                             <i class="fas fa-edit"></i>
                         </button>
-                        ${user.username !== 'admin' ? `
-                        <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-800">
+                        <button class="btn-danger" onclick="deleteUser(${user.id})">
                             <i class="fas fa-trash"></i>
                         </button>
-                        ` : ''}
                     </td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
-        function showAddUserModal() {
-            document.getElementById('newUsername').value = '';
-            document.getElementById('newUserPassword').value = '';
-            document.getElementById('newUserRole').value = '사용자';
-            document.getElementById('userModal').classList.remove('hidden');
-        }
+        async function addNewUser() {
+            const form = document.getElementById('addUserForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
 
-        function saveUser() {
-            const username = document.getElementById('newUsername').value;
-            const password = document.getElementById('newUserPassword').value;
-            const role = document.getElementById('newUserRole').value;
-            
-            if (!username || !password) {
-                alert('사용자명과 비밀번호를 입력해주세요.');
-                return;
-            }
-            
-            const existing = userData.find(u => u.username === username);
-            if (existing) {
-                alert('이미 존재하는 사용자명입니다.');
-                return;
-            }
-            
             const newUser = {
-                id: Date.now().toString(),
-                username,
-                password,
-                role,
-                createdAt: new Date().toLocaleDateString('ko-KR')
+                id: allUsers.length + 1,
+                username: document.getElementById('newUsername').value,
+                role: document.getElementById('newUserRole').value,
+                createdDate: new Date().toISOString().split('T')[0]
             };
-            
-            userData.push(newUser);
-            localStorage.setItem('users', JSON.stringify(userData));
-            closeUserModal();
-            loadUserData();
-            alert('사용자가 추가되었습니다.');
-        }
 
-        function editUser(id) {
-            const user = userData.find(u => u.id === id);
-            if (user) {
-                const newRole = prompt('새 권한을 선택하세요 (사용자/관리자/최고관리자):', user.role);
-                if (newRole && ['사용자', '관리자', '최고관리자'].includes(newRole)) {
-                    user.role = newRole;
-                    localStorage.setItem('users', JSON.stringify(userData));
-                    loadUserData();
-                    alert('권한이 변경되었습니다.');
-                }
-            }
-        }
+            const rowData = [
+                newUser.username,
+                newUser.role,
+                newUser.createdDate
+            ];
 
-        function deleteUser(id) {
-            if (confirm('정말 삭제하시겠습니까?')) {
-                userData = userData.filter(u => u.id !== id);
-                localStorage.setItem('users', JSON.stringify(userData));
-                loadUserData();
-            }
-        }
+            await appendSheet(SHEETS.USERS, [rowData]);
+            allUsers.push(newUser);
 
-        function closeUserModal() {
-            document.getElementById('userModal').classList.add('hidden');
+            closeModal('addUserModal');
+            form.reset();
+            renderUserTable();
+            alert('저장되었습니다.');
         }
 
         // Feedback Functions
-        function loadFeedbackData() {
+        function renderFeedbackTable() {
             const tbody = document.getElementById('feedbackTableBody');
+            const start = (currentFeedbackPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = allFeedback.slice(start, end);
+
             tbody.innerHTML = '';
-            
-            feedbackData.forEach((post, index) => {
+
+            pageData.forEach((feedback, index) => {
                 const row = document.createElement('tr');
-                row.className = 'border-b hover:bg-gray-50 cursor-pointer';
-                row.onclick = () => viewPost(post.id);
                 row.innerHTML = `
-                    <td class="px-4 py-3">${feedbackData.length - index}</td>
-                    <td class="px-4 py-3 text-blue-600 hover:underline">${post.title}</td>
-                    <td class="px-4 py-3">${post.author}</td>
-                    <td class="px-4 py-3">${post.createdAt}</td>
-                    <td class="px-4 py-3">${post.views || 0}</td>
+                    <td>${start + index + 1}</td>
+                    <td><a href="#" class="text-blue-600 hover:underline" onclick="openFeedbackDetail(${feedback.id})">${feedback.title}</a></td>
+                    <td>${feedback.author}</td>
+                    <td>${feedback.createdDate}</td>
+                    <td>${feedback.views}</td>
+                    <td>
+                        <button class="btn-danger" onclick="deleteFeedback(${feedback.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
+
+            // Update pagination
+            const totalPages = Math.ceil(allFeedback.length / itemsPerPage);
+            document.getElementById('currentPageFeedback').value = currentFeedbackPage;
+            document.getElementById('totalPagesFeedback').textContent = totalPages;
+            document.getElementById('prevPageFeedback').disabled = currentFeedbackPage === 1;
+            document.getElementById('nextPageFeedback').disabled = currentFeedbackPage === totalPages;
         }
 
-        function showAddPostModal() {
-            document.getElementById('newPostTitle').value = '';
-            document.getElementById('newPostContent').value = '';
-            document.getElementById('postModal').classList.remove('hidden');
-        }
-
-        function savePost() {
-            const title = document.getElementById('newPostTitle').value;
-            const content = document.getElementById('newPostContent').value;
-            
-            if (!title || !content) {
-                alert('제목과 내용을 입력해주세요.');
+        async function addNewFeedback() {
+            const form = document.getElementById('addFeedbackForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
                 return;
             }
-            
-            const newPost = {
-                id: Date.now().toString(),
-                title,
-                content,
-                author: currentUser.username,
-                createdAt: new Date().toLocaleDateString('ko-KR'),
+
+            const newFeedback = {
+                id: allFeedback.length + 1,
+                title: document.getElementById('newFeedbackTitle').value,
+                content: document.getElementById('newFeedbackContent').value,
+                author: currentUser,
+                createdDate: new Date().toISOString().split('T')[0],
                 views: 0
             };
-            
-            feedbackData.unshift(newPost);
-            localStorage.setItem('feedback', JSON.stringify(feedbackData));
-            closePostModal();
-            loadFeedbackData();
-            alert('글이 작성되었습니다.');
+
+            const rowData = [
+                newFeedback.id,
+                newFeedback.title,
+                newFeedback.content,
+                newFeedback.author,
+                newFeedback.createdDate,
+                newFeedback.views
+            ];
+
+            await appendSheet(SHEETS.FEEDBACK, [rowData]);
+            allFeedback.push(newFeedback);
+
+            closeModal('addFeedbackModal');
+            form.reset();
+            renderFeedbackTable();
+            alert('저장되었습니다.');
         }
 
-        function closePostModal() {
-            document.getElementById('postModal').classList.add('hidden');
-        }
-
-        function viewPost(id) {
-            const post = feedbackData.find(p => p.id === id);
-            if (post) {
-                post.views = (post.views || 0) + 1;
-                localStorage.setItem('feedback', JSON.stringify(feedbackData));
-                alert(`제목: ${post.title}\n\n내용: ${post.content}\n\n작성자: ${post.author}\n작성일: ${post.createdAt}`);
-                loadFeedbackData();
-            }
-        }
-
-        // Excel Download Functions
+        // File Upload Functions
         function downloadRentalSample() {
             const headers = [
                 '순번', '관리번호', '제품시리얼', '학교명', '학교급', '학생명', '상태', '메모1', '메모2',
@@ -1406,331 +1790,324 @@
             ];
             
             const sampleData = [
-                ['1', '2025-NEW1', 'UPLOADED001', '성수초등학교', '초', '비즈마크닉', '대여중', '메모1', '메모2',
-                 '2012-01-01', '010-1234-5678', '2025-01-01', '김부모', '부모', '010-9876-5432', '기타사항',
-                 '양호', '양호', '양호', '양호', '양호', '양호']
+                ['1', '2025-NEW1', 'UPLOADED001', '오름초등학교', '초등학교', '박지성', '대여중', '오름초등학교', '대학수', 
+                 '20111105', '01037892', '20250407', '김부모', '부', '01049962933', '', '양호', '양호', '양호', '양호', '양호', '양호']
             ];
-            
-            downloadExcel([headers, ...sampleData], '대여관리_업로드샘플');
+
+            downloadExcel(headers, sampleData, '대여관리_샘플.xlsx');
         }
 
         function downloadProductSample() {
             const headers = ['차수', '관리번호', '제품명', '시리얼'];
             const sampleData = [
-                ['1차', '2025-UPLOAD1', '삼성노트북', 'UPLOADED001'],
-                ['2차', '2025-UPLOAD2', 'LG노트북', 'UPLOADED002']
+                ['1차', '2025-UPLOAD1', '삼성노트북A', 'UPLOADED001'],
+                ['2차', '2025-UPLOAD2', '프로젝터 (EPSON)', 'UPLOADED002']
             ];
-            
-            downloadExcel([headers, ...sampleData], '제품관리_업로드샘플');
+
+            downloadExcel(headers, sampleData, '제품관리_샘플.xlsx');
         }
 
-        function downloadExcel(data, filename) {
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-            XLSX.writeFile(wb, filename + '.xlsx');
+        function downloadExcel(headers, data, filename) {
+            // Create CSV content
+            const csvContent = [headers, ...data]
+                .map(row => row.map(cell => `"${cell}"`).join(','))
+                .join('\n');
+
+            // Create blob and download
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename.replace('.xlsx', '.csv');
+            link.click();
         }
 
-        // Upload Functions
-        function uploadRentalData(input) {
-            const file = input.files[0];
+        function uploadFile(type) {
+            const fileInput = document.getElementById('fileUpload');
+            fileInput.onchange = (e) => handleFileUpload(e, type);
+            fileInput.click();
+        }
+
+        function handleFileUpload(event, type) {
+            const file = event.target.files[0];
             if (!file) return;
-            
+
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = (e) => {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
-                    
-                    if (jsonData.length < 2) {
-                        alert('데이터가 없습니다.');
-                        return;
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    if (type === 'product') {
+                        processProductUpload(jsonData);
+                    } else if (type === 'rental') {
+                        processRentalUpload(jsonData);
                     }
-                    
-                    const headers = jsonData[0];
-                    const rows = jsonData.slice(1);
-                    
-                    let successCount = 0;
-                    rows.forEach(row => {
-                        if (row.length >= 6) { // Minimum required fields
-                            const rental = {
-                                id: Date.now().toString() + Math.random(),
-                                managementNo: row[1] || '',
-                                productSerial: row[2] || '',
-                                schoolName: row[3] || '',
-                                schoolLevel: row[4] || '',
-                                studentName: row[5] || '',
-                                status: '대여중', // Always set to 대여중
-                                memo1: row[7] || '',
-                                memo2: row[8] || '',
-                                studentBirth: row[9] || '',
-                                studentPhone: row[10] || '',
-                                privacyDate: row[11] || '',
-                                guardianName: row[12] || '',
-                                relationship: row[13] || '',
-                                guardianPhone: row[14] || '',
-                                otherInfo: row[15] || '',
-                                charger: row[16] || '양호',
-                                chargingCable: row[17] || '양호',
-                                usbAdapter: row[18] || '양호',
-                                mouse: row[19] || '양호',
-                                bag: row[20] || '양호',
-                                case: row[21] || '양호',
-                                createdAt: new Date().toISOString()
-                            };
-                            
-                            // Find product name from product data
-                            const product = productData.find(p => p.serial === rental.productSerial);
-                            if (product) {
-                                rental.productName = product.name;
-                            }
-                            
-                            rentalData.push(rental);
-                            successCount++;
-                        }
-                    });
-                    
-                    localStorage.setItem('rentals', JSON.stringify(rentalData));
-                    loadRentalData();
-                    updateDashboard();
-                    alert(`${successCount}개의 대여 데이터가 업로드되었습니다.`);
                 } catch (error) {
-                    alert('파일 읽기 오류: ' + error.message);
+                    alert('파일을 읽는 중 오류가 발생했습니다.');
+                    console.error(error);
                 }
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function uploadProductData(input) {
-            const file = input.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
-                    
-                    if (jsonData.length < 2) {
-                        alert('데이터가 없습니다.');
-                        return;
-                    }
-                    
-                    const headers = jsonData[0];
-                    const rows = jsonData.slice(1);
-                    
-                    let successCount = 0;
-                    rows.forEach(row => {
-                        if (row.length >= 4) {
-                            const product = {
-                                id: Date.now().toString() + Math.random(),
-                                phase: row[0] || '',
-                                managementNo: row[1] || '',
-                                name: row[2] || '',
-                                serial: row[3] || '',
-                                createdAt: new Date().toISOString()
-                            };
-                            
-                            productData.push(product);
-                            successCount++;
-                        }
-                    });
-                    
-                    localStorage.setItem('products', JSON.stringify(productData));
-                    loadProductData();
-                    updateDashboard();
-                    alert(`${successCount}개의 제품 데이터가 업로드되었습니다.`);
-                } catch (error) {
-                    alert('파일 읽기 오류: ' + error.message);
+        async function processProductUpload(data) {
+            if (data.length < 2) {
+                alert('올바른 형식의 파일이 아닙니다.');
+                return;
+            }
+
+            const newProducts = [];
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (row.length >= 4 && row[1] && row[3]) {
+                    newProducts.push([row[0], row[1], row[2], row[3]]);
                 }
-            };
-            reader.readAsArrayBuffer(file);
+            }
+
+            if (newProducts.length === 0) {
+                alert('업로드할 데이터가 없습니다.');
+                return;
+            }
+
+            await appendSheet(SHEETS.PRODUCTS, newProducts);
+            await loadAllData();
+            alert(`${newProducts.length}개의 제품이 업로드되었습니다.`);
         }
 
-        // Search Functions
-        function searchRentals() {
-            const searchTerm = document.getElementById('searchRental').value.toLowerCase();
-            const statusFilter = document.getElementById('statusFilter').value;
-            const phaseFilter = document.getElementById('phaseFilter').value;
-            const modelFilter = document.getElementById('modelFilter').value;
-            const dateStart = document.getElementById('dateStart').value;
-            const dateEnd = document.getElementById('dateEnd').value;
-            
-            let filtered = rentalData.filter(rental => {
-                const matchesSearch = !searchTerm || 
-                    (rental.managementNo && rental.managementNo.toLowerCase().includes(searchTerm)) ||
-                    (rental.schoolName && rental.schoolName.toLowerCase().includes(searchTerm)) ||
-                    (rental.studentName && rental.studentName.toLowerCase().includes(searchTerm)) ||
-                    (rental.productName && rental.productName.toLowerCase().includes(searchTerm));
-                    
-                const matchesStatus = !statusFilter || rental.status === statusFilter;
-                const matchesModel = !modelFilter || rental.productName === modelFilter;
-                
-                let matchesDate = true;
-                if (dateStart && rental.privacyDate) {
-                    matchesDate = rental.privacyDate >= dateStart;
+        async function processRentalUpload(data) {
+            if (data.length < 2) {
+                alert('올바른 형식의 파일이 아닙니다.');
+                return;
+            }
+
+            const newRentals = [];
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (row.length >= 6 && row[1] && row[2]) {
+                    // Ensure all 22 columns are present
+                    const fullRow = new Array(22).fill('').map((_, index) => row[index] || '');
+                    fullRow[6] = '대여중'; // Status always set to rental
+                    newRentals.push(fullRow);
                 }
-                if (dateEnd && rental.privacyDate && matchesDate) {
-                    matchesDate = rental.privacyDate <= dateEnd;
-                }
-                
-                return matchesSearch && matchesStatus && matchesModel && matchesDate;
-            });
-            
-            rentalData = filtered;
-            currentRentalPage = 1;
-            loadRentalData();
+            }
+
+            if (newRentals.length === 0) {
+                alert('업로드할 데이터가 없습니다.');
+                return;
+            }
+
+            await appendSheet(SHEETS.RENTALS, newRentals);
+            await loadAllData();
+            alert(`${newRentals.length}개의 대여 정보가 업로드되었습니다.`);
         }
 
-        function resetSearch() {
-            document.getElementById('searchRental').value = '';
-            document.getElementById('statusFilter').value = '';
-            document.getElementById('phaseFilter').value = '';
-            document.getElementById('modelFilter').value = '';
-            document.getElementById('dateStart').value = '';
-            document.getElementById('dateEnd').value = '';
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
             
-            loadData();
-            loadRentalData();
+            // Make modal draggable
+            const modal = document.getElementById(modalId);
+            const header = modal.querySelector('.modal-header');
+            makeDraggable(modal, header);
         }
 
-        // Pagination Functions
-        function nextPage(type) {
-            if (type === 'rental') {
-                const totalPages = Math.ceil(rentalData.length / itemsPerPage);
-                if (currentRentalPage < totalPages) {
-                    currentRentalPage++;
-                    loadRentalData();
-                }
-            } else if (type === 'product') {
-                const totalPages = Math.ceil(productData.length / itemsPerPage);
-                if (currentProductPage < totalPages) {
-                    currentProductPage++;
-                    loadProductData();
-                }
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function makeDraggable(element, handle) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            handle.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                element.style.top = (element.offsetTop - pos2) + "px";
+                element.style.left = (element.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
             }
         }
 
-        function prevPage(type) {
-            if (type === 'rental') {
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load Google Sheets API
+            const script = document.createElement('script');
+            script.src = 'https://apis.google.com/js/api.js';
+            script.onload = initGoogleSheetsAPI;
+            document.head.appendChild(script);
+
+            // Load XLSX library
+            const xlsxScript = document.createElement('script');
+            xlsxScript.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+            document.head.appendChild(xlsxScript);
+
+            // Check authentication
+            if (checkAuth()) {
+                showMainSystem();
+            } else {
+                showLoginScreen();
+            }
+
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                if (login(username, password)) {
+                    showMainSystem();
+                } else {
+                    alert('로그인 정보가 올바르지 않습니다.');
+                }
+            });
+
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+
+            // Menu navigation
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.dataset.page;
+                    showPage(page);
+                });
+            });
+
+            // Search and filter events
+            document.getElementById('searchBtn').addEventListener('click', searchRentals);
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                document.getElementById('rentalSearch').value = '';
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('phaseFilter').value = '';
+                document.getElementById('modelFilter').value = '';
+                document.getElementById('dateStart').value = '';
+                document.getElementById('dateEnd').value = '';
+                filteredRentals = [...allRentals];
+                currentRentalPage = 1;
+                renderRentalTable();
+            });
+
+            // Action buttons
+            document.getElementById('addRentalBtn').addEventListener('click', () => openModal('addRentalModal'));
+            document.getElementById('downloadRentalSampleBtn').addEventListener('click', downloadRentalSample);
+            document.getElementById('uploadRentalBtn').addEventListener('click', () => uploadFile('rental'));
+
+            document.getElementById('addProductBtn').addEventListener('click', () => openModal('addProductModal'));
+            document.getElementById('downloadProductSampleBtn').addEventListener('click', downloadProductSample);
+            document.getElementById('uploadProductBtn').addEventListener('click', () => uploadFile('product'));
+
+            document.getElementById('addUserBtn').addEventListener('click', () => openModal('addUserModal'));
+            document.getElementById('addFeedbackBtn').addEventListener('click', () => openModal('addFeedbackModal'));
+
+            // Form submissions
+            document.getElementById('addRentalForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewRental();
+            });
+
+            document.getElementById('addProductForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewProduct();
+            });
+
+            document.getElementById('addUserForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewUser();
+            });
+
+            document.getElementById('addFeedbackForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewFeedback();
+            });
+
+            // Pagination events
+            document.getElementById('prevPageRental').addEventListener('click', function() {
                 if (currentRentalPage > 1) {
                     currentRentalPage--;
-                    loadRentalData();
-                }
-            } else if (type === 'product') {
-                if (currentProductPage > 1) {
-                    currentProductPage--;
-                    loadProductData();
-                }
-            }
-        }
-
-        function goToPage(type, page) {
-            const pageNum = parseInt(page);
-            if (type === 'rental') {
-                const totalPages = Math.ceil(rentalData.length / itemsPerPage);
-                if (pageNum >= 1 && pageNum <= totalPages) {
-                    currentRentalPage = pageNum;
-                    loadRentalData();
-                }
-            } else if (type === 'product') {
-                const totalPages = Math.ceil(productData.length / itemsPerPage);
-                if (pageNum >= 1 && pageNum <= totalPages) {
-                    currentProductPage = pageNum;
-                    loadProductData();
-                }
-            }
-        }
-
-        // Delete All Functions
-        function deleteAllRentals() {
-            if (confirm('모든 대여 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-                rentalData = [];
-                localStorage.setItem('rentals', JSON.stringify(rentalData));
-                loadRentalData();
-                updateDashboard();
-                alert('모든 대여 데이터가 삭제되었습니다.');
-            }
-        }
-
-        function deleteAllProducts() {
-            if (confirm('모든 제품 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-                productData = [];
-                localStorage.setItem('products', JSON.stringify(productData));
-                loadProductData();
-                updateDashboard();
-                alert('모든 제품 데이터가 삭제되었습니다.');
-            }
-        }
-
-        // Make modals draggable
-        function makeDraggable() {
-            const modals = document.querySelectorAll('.tg-modal-content');
-            modals.forEach(modal => {
-                const header = modal.querySelector('.draggable-modal');
-                if (header) {
-                    let isDragging = false;
-                    let currentX;
-                    let currentY;
-                    let initialX;
-                    let initialY;
-                    let xOffset = 0;
-                    let yOffset = 0;
-
-                    header.addEventListener('mousedown', dragStart);
-                    document.addEventListener('mousemove', drag);
-                    document.addEventListener('mouseup', dragEnd);
-
-                    function dragStart(e) {
-                        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'I') return;
-                        
-                        initialX = e.clientX - xOffset;
-                        initialY = e.clientY - yOffset;
-
-                        if (e.target === header || header.contains(e.target)) {
-                            isDragging = true;
-                        }
-                    }
-
-                    function drag(e) {
-                        if (isDragging) {
-                            e.preventDefault();
-                            currentX = e.clientX - initialX;
-                            currentY = e.clientY - initialY;
-
-                            xOffset = currentX;
-                            yOffset = currentY;
-
-                            modal.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-                        }
-                    }
-
-                    function dragEnd(e) {
-                        initialX = currentX;
-                        initialY = currentY;
-                        isDragging = false;
-                    }
+                    renderRentalTable();
                 }
             });
-        }
 
-        // Initialize on page load
-        window.onload = function() {
-            showPage('rental');
-        };
+            document.getElementById('nextPageRental').addEventListener('click', function() {
+                const totalPages = Math.ceil(filteredRentals.length / itemsPerPage);
+                if (currentRentalPage < totalPages) {
+                    currentRentalPage++;
+                    renderRentalTable();
+                }
+            });
+
+            document.getElementById('currentPageRental').addEventListener('change', function() {
+                const totalPages = Math.ceil(filteredRentals.length / itemsPerPage);
+                const page = parseInt(this.value);
+                if (page >= 1 && page <= totalPages) {
+                    currentRentalPage = page;
+                    renderRentalTable();
+                } else {
+                    this.value = currentRentalPage;
+                }
+            });
+
+            // Product pagination
+            document.getElementById('prevPageProduct').addEventListener('click', function() {
+                if (currentProductPage > 1) {
+                    currentProductPage--;
+                    renderProductTable();
+                }
+            });
+
+            document.getElementById('nextPageProduct').addEventListener('click', function() {
+                const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+                if (currentProductPage < totalPages) {
+                    currentProductPage++;
+                    renderProductTable();
+                }
+            });
+
+            // Modal close events
+            document.querySelectorAll('.close').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    modal.style.display = 'none';
+                });
+            });
+
+            // Click outside modal to close
+            window.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
+            });
+        });
     </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9548aee17998d4e3","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.6.2","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9548d86bfb81d4e3","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.6.2","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
 </body>
 </html>
     <script id="html_badge_script1">
         window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDi2pJhL24jtaSVwNLTuHxQCGJ7OfRAXqbg0NrSG6sgN%2Bm2Umdynq8WlZ5SXZkzoBi2YhcfDAWWwE5wMkqeaSR0xoi8GlLJxQXGej6TX4nLdtgb2%2BBfIg64OXeBp4e1Gwhtu%2FgljbjrUjhR2fnnIM3AEwO%2B4yJzSm6XdywpLvOc41l%2FYtpavk7HH0vYPNMmeMJN1j%2FNjEfMzgdpZ5lTSZV9kVatv6uvURYcD39a9bFekRCqSwFq%2FemuH0DM2JbgYWRL%2FOrsM3ZBBzg%2F%2FZ6vIipUTiIB138wNsHFcc3lUpsxn2lp%2B%2BhNhDZNrhns9Mjbp%2FAZGESPvtyuFxhiOuI0S8xrCaPBalsvHoW5CpzmkK8BpMUENNb9Jg%2FpCwyW3j%2FNt%2FaKdXPHtpqPIZVZuRjLYBnvfVqI0KCn8ux1gIYyJwUzS045UNurTrzNAfXrQlj%2FbdwjzN%2Bubiwa6dUJRsGofUrl%2B8RuWHWSxnA2D195Qe9nP22nYHaAH8EqFIJ6e%2BNJkoJ%2F%2BLbfVQMEhpiP3aXkvc3Zs%3D";
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDhApvId9ce1ctZ2ErTsP3bCXGemBUCtJH1rtjo0yAebHjqCPy0irtWD3TKU01nLaFtpoEckk078b7rhuy0emswYdzTBjhJvYLB0weR%2Bh278SVkIzzpoT720nksN5%2FGVf3Xp8NOSSmhc4EEpN9O03OLVYgvi0VpKk%2FbF0AYRz1oBqqwpWlRgspihW1t15yscY04E9NFJ5P%2FTywkK0z991bLWQDh3I1cklCOAOqwY5CUkJyE6oGKkzovxqP%2FW%2B6s%2FIEpmC6VgwC5PewoBPHJRAyul%2Bg8QfWevE%2FL348c1wvantFHXau5MsR%2BefKwRLeQ6Y8uiNsjR9BDo3tVmbeWKgvuBgLB%2BjysXMuPd0D3Jld0j4bQX31qXKJqnSU7JTVV4yBx%2BxRIFkfK1QV53OJ8v6nx%2BlCqAZqK%2B2qcVej5pEZEJ%2BJxO1UtYriTzjv7Ndfi6Gi1FP8UnSJdOnJ%2FhdnGr7ao%2BpRi1e8%2FwI3RRt3TodPNrpKZAPgZr48bUhOpxyWzI%2F4K3k%2BoDNIUOJ%2BJIpkcaU3IA%3D";
         window.__genspark_locale = "ko-KR";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDi2pJhL24jtaSVwNLTuHxQCGJ7OfRAXqbg0NrSG6sgN+m2Umdynq8WlZ5SXZkzoBi2YhcfDAWWwE5wMkqeaSR0xoi8GlLJxQXGej6TX4nLdtgb2+BfIg64OXeBp4e1Gwhtu/gljbjrUjhR2fnnIM3AEwO+4yJzSm6XdywpLvOc41l/Ytpavk7HH0vYPNMmeMJN1j/NjEfMzgdpZ5lTSZV9kVatv6uvURYcD39a9bFekRCqSwFq/emuH0DM2JbgYWRL/OrsM3ZBBzg//Z6vIipUTiIB138wNsHFcc3lUpsxn2lp++hNhDZNrhns9Mjbp/AZGESPvtyuFxhiOuI0S8xrCaPBalsvHoW5CpzmkK8BpMUENNb9Jg/pCwyW3j/Nt/aKdXPHtpqPIZVZuRjLYBnvfVqI0KCn8ux1gIYyJwUzS045UNurTrzNAfXrQlj/bdwjzN+ubiwa6dUJRsGofUrl+8RuWHWSxnA2D195Qe9nP22nYHaAH8EqFIJ6e+NJkoJ/+LbfVQMEhpiP3aXkvc3Zs=";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDhApvId9ce1ctZ2ErTsP3bCXGemBUCtJH1rtjo0yAebHjqCPy0irtWD3TKU01nLaFtpoEckk078b7rhuy0emswYdzTBjhJvYLB0weR+h278SVkIzzpoT720nksN5/GVf3Xp8NOSSmhc4EEpN9O03OLVYgvi0VpKk/bF0AYRz1oBqqwpWlRgspihW1t15yscY04E9NFJ5P/TywkK0z991bLWQDh3I1cklCOAOqwY5CUkJyE6oGKkzovxqP/W+6s/IEpmC6VgwC5PewoBPHJRAyul+g8QfWevE/L348c1wvantFHXau5MsR+efKwRLeQ6Y8uiNsjR9BDo3tVmbeWKgvuBgLB+jysXMuPd0D3Jld0j4bQX31qXKJqnSU7JTVV4yBx+xRIFkfK1QV53OJ8v6nx+lCqAZqK+2qcVej5pEZEJ+JxO1UtYriTzjv7Ndfi6Gi1FP8UnSJdOnJ/hdnGr7ao+pRi1e8/wI3RRt3TodPNrpKZAPgZr48bUhOpxyWzI/4K3k+oDNIUOJ+JIpkcaU3IA=";
     </script>
     
     <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
